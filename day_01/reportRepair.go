@@ -56,7 +56,7 @@ func sumOfThreeEqualsTo(numbers []int, target int) (int, error) {
 }
 
 func main() {
-	expenses, _ := readLines("/home/orfeas/code/advent-of-code-2020/day_01/input.txt")
+	expenses, _ := readLines("./day_01/input.txt")
 
 	res1, _ := sumOfTwoEqualsTo(expenses, 2020)
 	fmt.Println(res1)
