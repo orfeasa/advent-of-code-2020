@@ -19,11 +19,11 @@ func main() {
 
 	for _, line := range lines {
 		match := regex.FindStringSubmatch(line)
-		minOcc, maxOcc, char, password := toInt(match[1]), toInt(match[2]), match[3], match[4]
-		if isValidOldPolicy(minOcc, maxOcc, char, password) {
+		pos1, pos2, char, password := toInt(match[1]), toInt(match[2]), match[3], match[4]
+		if isValidOldPolicy(pos1, pos2, char, password) {
 			countOld++
 		}
-		if isValidNewPolicy(minOcc, maxOcc, char, password) {
+		if isValidNewPolicy(pos1, pos2, char, password) {
 			countNew++
 		}
 	}
