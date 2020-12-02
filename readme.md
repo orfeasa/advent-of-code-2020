@@ -7,3 +7,4 @@ This year I am doing it in Go.
 |Day|Name|Stars|
 |---|---|---|
 |[01](https://adventofcode.com/2020/day/1)|Report Repair|⭐⭐|
+|[02](https://adventofcode.com/2020/day/2)|Password Philosophy|⭐⭐|
