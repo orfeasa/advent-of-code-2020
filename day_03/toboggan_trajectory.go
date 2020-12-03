@@ -23,9 +23,7 @@ func main() {
 	wg.Add(len(slopes))
 	for _, slope := range slopes {
 		go func(slope []int) {
-			fmt.Println("Added 1 to wg on slope", slope)
 			defer wg.Done()
-			defer fmt.Println("Done for slope ", slope)
 			treesMultiplied *= countTreesInPath(lines, slope[0], slope[1])
 		}(slope)
 	}
