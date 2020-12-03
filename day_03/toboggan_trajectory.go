@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -77,12 +76,6 @@ func readLines(filename string) []string {
 		lines = append(lines, strings.TrimSuffix(scanner.Text(), "\n"))
 	}
 	return lines
-}
-
-func toInt(s string) int {
-	result, err := strconv.Atoi(s)
-	check(err)
-	return result
 }
 
 func check(err error) {
