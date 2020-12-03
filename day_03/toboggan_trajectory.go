@@ -3,15 +3,12 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"sync"
-	"time"
 )
 
 func main() {
-	start := time.Now()
 
 	inputPath := "./day_03/input.txt"
 	slopes := [][]int{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}}
@@ -31,8 +28,6 @@ func main() {
 	wg.Wait()
 	fmt.Println("Number of trees:", treesMultiplied)
 
-	elapsed := time.Since(start)
-	log.Printf("\nTook %s", elapsed)
 }
 
 func countTreesInPath(mapOfTrees []string, right, down int) int {
