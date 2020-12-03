@@ -3,23 +3,47 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 )
 
 func main() {
+	start := time.Now()
 	inputPath := "./day_03/input.txt"
 	lines := readLines(inputPath)
 
 	treesMultiplied := 1
-	treesMultiplied *= countTreesInPath(lines, 1, 1)
-	treesMultiplied *= countTreesInPath(lines, 3, 1)
-	treesMultiplied *= countTreesInPath(lines, 5, 1)
-	treesMultiplied *= countTreesInPath(lines, 7, 1)
-	treesMultiplied *= countTreesInPath(lines, 1, 2)
+	var wg sync.WaitGroup
+	wg.Add(5)
+	go func() {
+		defer wg.Done()
+		treesMultiplied *= countTreesInPath(lines, 1, 1)
+	}()
+	go func() {
+		defer wg.Done()
+		treesMultiplied *= countTreesInPath(lines, 3, 1)
+	}()
+	go func() {
+		defer wg.Done()
+		treesMultiplied *= countTreesInPath(lines, 5, 1)
+	}()
+	go func() {
+		defer wg.Done()
+		treesMultiplied *= countTreesInPath(lines, 7, 1)
+	}()
+	go func() {
+		defer wg.Done()
+		treesMultiplied *= countTreesInPath(lines, 2, 3)
+	}()
 
+	wg.Wait()
 	fmt.Println("Number of trees:", treesMultiplied)
+	elapsed := time.Since(start)
+	log.Printf("\nTook %s", elapsed)
 }
 
 func countTreesInPath(mapOfTrees []string, right, down int) int {
