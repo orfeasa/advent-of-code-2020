@@ -8,3 +8,4 @@ This year I am doing it in Go.
 |---|---|---|
 |[01](https://adventofcode.com/2020/day/1)|Report Repair|⭐⭐|
 |[02](https://adventofcode.com/2020/day/2)|Password Philosophy|⭐⭐|
+|[03](https://adventofcode.com/2020/day/3)|Toboggan Trajectory|⭐⭐|
