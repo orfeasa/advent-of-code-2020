@@ -12,35 +12,27 @@ import (
 
 func main() {
 	start := time.Now()
+
 	inputPath := "./day_03/input.txt"
+	slopes := [][]int{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}}
+
 	lines := readLines(inputPath)
 
 	treesMultiplied := 1
 	var wg sync.WaitGroup
-	wg.Add(5)
-	go func() {
-		defer wg.Done()
-		treesMultiplied *= countTreesInPath(lines, 1, 1)
-	}()
-	go func() {
-		defer wg.Done()
-		treesMultiplied *= countTreesInPath(lines, 3, 1)
-	}()
-	go func() {
-		defer wg.Done()
-		treesMultiplied *= countTreesInPath(lines, 5, 1)
-	}()
-	go func() {
-		defer wg.Done()
-		treesMultiplied *= countTreesInPath(lines, 7, 1)
-	}()
-	go func() {
-		defer wg.Done()
-		treesMultiplied *= countTreesInPath(lines, 2, 3)
-	}()
+	wg.Add(len(slopes))
+	for _, slope := range slopes {
+		go func(slope []int) {
+			fmt.Println("Added 1 to wg on slope", slope)
+			defer wg.Done()
+			defer fmt.Println("Done for slope ", slope)
+			treesMultiplied *= countTreesInPath(lines, slope[0], slope[1])
+		}(slope)
+	}
 
 	wg.Wait()
 	fmt.Println("Number of trees:", treesMultiplied)
+
 	elapsed := time.Since(start)
 	log.Printf("\nTook %s", elapsed)
 }
