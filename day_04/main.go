@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -11,49 +12,94 @@ func main() {
 	inputPath := "./day_04/input.txt"
 	lines := readLines(inputPath)
 
-	fieldsString := []string{"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid"}
-	possibleFields := make(map[string]bool)
-	for _, field := range fieldsString {
-		possibleFields[field] = true
-	}
-
-	fmt.Println(countValidPassports(lines, possibleFields, "cid"))
-
+	fmt.Println(countValidPassports(lines))
 }
 
-func countValidPassports(lines []string, possibleFields map[string]bool, optionalField string) int {
-	missingFields := make(map[string]bool)
-	for k, v := range possibleFields {
-		missingFields[k] = v
-	}
+func countValidPassports(lines []string) int {
+	fields := make(map[string]string)
 
 	countValid := 0
 
 	for _, line := range lines {
+		// if line is not empty (we are reading passport data)
 		if line != "" {
-			data := strings.Split(line, " ")
-			var lineFields []string
-			for _, pair := range data {
-				field := strings.Split(pair, ":")
-				lineFields = append(lineFields, field[0])
-			}
-
-			for _, field := range lineFields {
-				delete(missingFields, field)
+			fieldsAndValues := strings.Split(line, " ")
+			for _, fieldAndValue := range fieldsAndValues {
+				fieldValue := strings.Split(fieldAndValue, ":")
+				fields[fieldValue[0]] = fieldValue[1]
 			}
 		} else {
-			if len(missingFields) == 0 || (len(missingFields) == 1 && missingFields["cid"]) {
+			if isValidPassport(fields) {
 				// increase count of valid passports
 				countValid++
 			}
-
-			// reset missingFields with all possible fields
-			for k := range possibleFields {
-				missingFields[k] = true
-			}
+			// reset fields
+			fields = make(map[string]string)
 		}
 	}
 	return countValid
+}
+
+func isValidPassport(fields map[string]string) bool {
+	// validate birth year
+	if val, ok := fields["byr"]; !ok || len(val) != 4 || toInt(val) < 1920 || toInt(val) > 2002 {
+		return false
+	}
+
+	// validate issue year
+	if val, ok := fields["iyr"]; !ok || len(val) != 4 || toInt(val) < 2010 || toInt(val) > 2020 {
+		return false
+	}
+
+	// validate expiration year
+	if val, ok := fields["eyr"]; !ok || len(val) != 4 || toInt(val) < 2020 || toInt(val) > 2030 {
+		return false
+	}
+
+	// validate height
+	if val, ok := fields["hgt"]; !ok {
+		return false
+	} else {
+		unit := val[len(val)-2:]
+		// check valid unit
+		if unit != "cm" && unit != "in" {
+			return false
+		}
+		height := toInt(val[:len(val)-2])
+		if unit == "cm" && (height < 150 || height > 193) {
+			return false
+		} else if unit == "in" && (height < 59 || height > 76) {
+			return false
+		}
+	}
+
+	// validate hair color
+	if val, ok := fields["hcl"]; !ok {
+		return false
+	} else {
+		if string(val[0]) != "#" {
+			return false
+		}
+		color := val[1:]
+		if _, err := strconv.ParseInt(color, 16, 32); len(color) != 6 || err != nil {
+			return false
+		}
+
+	}
+
+	// validate eye color
+	if val, ok := fields["ecl"]; !ok || (val != "amb" && val != "blu" && val != "brn" && val != "gry" && val != "grn" && val != "hzl" && val != "oth") {
+		return false
+	}
+
+	// validate passport id
+	if val, ok := fields["pid"]; !ok || len(val) != 9 {
+		return false
+	} else if _, err := strconv.Atoi(val); err != nil {
+		return false
+	}
+
+	return true
 }
 
 func readLines(filename string) []string {
@@ -77,4 +123,10 @@ func check(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func toInt(s string) int {
+	result, err := strconv.Atoi(s)
+	check(err)
+	return result
 }
