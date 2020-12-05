@@ -10,3 +10,5 @@ This year I am doing it in Go.
 |[02](https://adventofcode.com/2020/day/2)|Password Philosophy|⭐⭐|
 |[03](https://adventofcode.com/2020/day/3)|Toboggan Trajectory|⭐⭐|
 |[04](https://adventofcode.com/2020/day/4)|Passport Processing|⭐⭐|
+|[05](https://adventofcode.com/2020/day/5)|Binary Boarding|⭐⭐|
+

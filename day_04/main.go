@@ -20,6 +20,23 @@ func countValidPassports(lines []string) int {
 
 	countValid := 0
 
+	passports := strings.Split(lines, "\n\n")
+
+	for _, passport := range passports {
+		passportData := strings.ReplaceAll(passport, "\n", " ")
+		fieldsAndValues := strings.Split(line, " ")
+		for _, fieldAndValue := range fieldsAndValues {
+			fieldValue := strings.Split(fieldAndValue, ":")
+			fields[fieldValue[0]] = fieldValue[1]
+		}
+		if isValidPassport(fields) {
+			// increase count of valid passports
+			countValid++
+		}
+		// reset fields
+		fields = make(map[string]string)
+	}
+
 	for _, line := range lines {
 		// if line is not empty (we are reading passport data)
 		if line != "" {
@@ -88,6 +105,7 @@ func isValidPassport(fields map[string]string) bool {
 	}
 
 	// validate eye color
+	// TODO: implement "in" function
 	if val, ok := fields["ecl"]; !ok || (val != "amb" && val != "blu" && val != "brn" && val != "gry" && val != "grn" && val != "hzl" && val != "oth") {
 		return false
 	}
