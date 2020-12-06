@@ -39,24 +39,30 @@ func Part2(inputPath string) int {
 	allAnswers := readRaw(inputPath)
 
 	groups := strings.Split(allAnswers, "\n\n")
-	sumCounts := 0
-	for _, group := range groups {
-		persons := strings.Split(group, "\n")
-		questionsCount := make(map[string]int)
 
-		for _, person := range persons {
-			for _, answer := range person {
-				questionsCount[string(answer)] += 1
+	sumCounts := 0
+	// iterate over each group
+	for _, group := range groups {
+		personsInGroup := strings.Split(group, "\n")
+		commonAnswers := make(map[string]bool)
+
+		// initialize map with 1st person's answers
+		for _, answer := range personsInGroup[0] {
+			commonAnswers[string(answer)] = true
+		}
+
+		// iterate over each person's answers
+		for _, personAnswers := range personsInGroup {
+			// iterate over the answers in each question
+			for answer, _ := range commonAnswers {
+				if !strings.Contains(personAnswers, answer) {
+					delete(commonAnswers, answer)
+				}
 			}
 		}
-		noOfQuestionsAnsweredByAll := 0
-		for k, _ := range questionsCount {
-			if questionsCount[k] == len(persons) {
-				noOfQuestionsAnsweredByAll++
-			}
-		}
-		sumCounts += noOfQuestionsAnsweredByAll
+		sumCounts += len(commonAnswers)
 	}
+
 	return sumCounts
 }
 
@@ -64,7 +70,7 @@ func Part2(inputPath string) int {
 func readRaw(filename string) string {
 	content, err := ioutil.ReadFile(filename)
 	check(err)
-	return string(content)
+	return strings.TrimRight(string(content), "\n")
 }
 
 func check(err error) {

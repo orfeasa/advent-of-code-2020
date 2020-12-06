@@ -11,4 +11,4 @@ This year I am doing it in Go.
 |[03](https://adventofcode.com/2020/day/3)|Toboggan Trajectory|⭐⭐|
 |[04](https://adventofcode.com/2020/day/4)|Passport Processing|⭐⭐|
 |[05](https://adventofcode.com/2020/day/5)|Binary Boarding|⭐⭐|
-
+|[06](https://adventofcode.com/2020/day/6)|Custom Customs|⭐⭐|
