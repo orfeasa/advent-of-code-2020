@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	inputPath := "./day_07/test_input.txt"
+	inputPath := "./day_07/input.txt"
 	fmt.Println("--- Part One ---")
 	fmt.Println(Part1(inputPath))
 
