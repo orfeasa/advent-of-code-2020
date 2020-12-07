@@ -18,13 +18,23 @@ func main() {
 }
 
 func Part1(inputPath string) int {
-	ruleMap := parseRules(readRaw(inputPath))
+	bagContains := parseRules(readRaw(inputPath))
+
+	bagIsContainedBy := make(map[string][]string)
+
+	// reverse map
+	for k1, v1 := range bagContains {
+		for k2, _ := range v1 {
+			bagIsContainedBy[k2] = append(bagIsContainedBy[k2], k1)
+		}
+	}
+
 	bagsFound := make(map[string]bool)
 	queue := []string{"shiny gold"}
 
 	for len(queue) > 0 {
 		currentColor := queue[0]
-		for color := range ruleMap[currentColor] {
+		for _, color := range bagIsContainedBy[currentColor] {
 			queue = append(queue, color)
 			bagsFound[color] = true
 		}
@@ -32,12 +42,25 @@ func Part1(inputPath string) int {
 		// dequeue
 		queue = queue[1:]
 	}
-	fmt.Println(bagsFound)
+
 	return len(bagsFound)
 }
 
 func Part2(inputPath string) int {
-	return 0
+	bagContains := parseRules(readRaw(inputPath))
+	return countBagsContainedIn("shiny gold", bagContains) - 1
+}
+
+func countBagsContainedIn(bagColor string, bagContains map[string]map[string]int) int {
+	if len(bagContains[bagColor]) == 0 {
+		return 1
+	}
+
+	count := 0
+	for color, qty := range bagContains[bagColor] {
+		count += qty * countBagsContainedIn(color, bagContains)
+	}
+	return count + 1
 }
 
 func parseRules(rules string) map[string]map[string]int {
@@ -50,7 +73,7 @@ func parseRules(rules string) map[string]map[string]int {
 		lineProcessed = strings.TrimRight(lineProcessed, " ")
 		// remove trailing dot
 		lineProcessed = strings.TrimRight(lineProcessed, ".")
-		// remobe reduntant bag reference
+		// remove reduntant bag reference
 		lineProcessed = strings.ReplaceAll(lineProcessed, " bags", "")
 		lineProcessed = strings.ReplaceAll(lineProcessed, " bag", "")
 		lineProcessed = strings.ReplaceAll(lineProcessed, "no other", "")
