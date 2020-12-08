@@ -13,3 +13,4 @@ This year I am doing it in Go.
 |[05](https://adventofcode.com/2020/day/5)|Binary Boarding|⭐⭐|
 |[06](https://adventofcode.com/2020/day/6)|Custom Customs|⭐⭐|
 |[07](https://adventofcode.com/2020/day/7)|Handy Haversacks|⭐⭐|
+|[08](https://adventofcode.com/2020/day/8)|Handheld Halting|⭐⭐|
