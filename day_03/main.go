@@ -8,8 +8,20 @@ import (
 )
 
 func main() {
-
 	inputPath := "./day_03/input.txt"
+	fmt.Println("--- Part One ---")
+	fmt.Println(part1(inputPath))
+
+	fmt.Println("--- Part Two ---")
+	fmt.Println(part2(inputPath))
+}
+
+func part1(inputPath string) int {
+	lines := strings.Split(readRaw(inputPath), "\n")
+	return countTreesInPath(lines, 3, 1)
+}
+
+func part2(inputPath string) int {
 	lines := strings.Split(readRaw(inputPath), "\n")
 
 	slopes := [][]int{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}}
@@ -26,8 +38,7 @@ func main() {
 	}
 
 	wg.Wait()
-	fmt.Println("Number of trees:", treesMultiplied)
-
+	return treesMultiplied
 }
 
 func countTreesInPath(mapOfTrees []string, right, down int) int {

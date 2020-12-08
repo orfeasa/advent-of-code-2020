@@ -11,10 +11,17 @@ import (
 
 func main() {
 	inputPath := "./day_02/input.txt"
+	fmt.Println("--- Part One ---")
+	fmt.Println(part1(inputPath))
+
+	fmt.Println("--- Part Two ---")
+	fmt.Println(part2(inputPath))
+}
+
+func part1(inputPath string) int {
 	lines := readLines(inputPath)
 
 	countOld := 0
-	countNew := 0
 	regex := regexp.MustCompile(`^(\d+)-(\d+) ([a-zA-Z]+): ([a-zA-Z]+)$`)
 
 	for _, line := range lines {
@@ -23,11 +30,24 @@ func main() {
 		if isValidOldPolicy(pos1, pos2, char, password) {
 			countOld++
 		}
+	}
+	return countOld
+}
+
+func part2(inputPath string) int {
+	lines := readLines(inputPath)
+
+	countNew := 0
+	regex := regexp.MustCompile(`^(\d+)-(\d+) ([a-zA-Z]+): ([a-zA-Z]+)$`)
+
+	for _, line := range lines {
+		match := regex.FindStringSubmatch(line)
+		pos1, pos2, char, password := toInt(match[1]), toInt(match[2]), match[3], match[4]
 		if isValidNewPolicy(pos1, pos2, char, password) {
 			countNew++
 		}
 	}
-	fmt.Println(countOld, countNew)
+	return countNew
 }
 
 func isValidOldPolicy(minOcc, maxOcc int, char string, password string) bool {

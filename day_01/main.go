@@ -8,6 +8,27 @@ import (
 	"strconv"
 )
 
+func main() {
+	inputPath := "./day_01/input.txt"
+	fmt.Println("--- Part One ---")
+	fmt.Println(part1(inputPath))
+
+	fmt.Println("--- Part Two ---")
+	fmt.Println(part2(inputPath))
+}
+
+func part1(inputPath string) int {
+	expenses, _ := readLines(inputPath)
+	res, _ := sumOfTwoEqualsTo(expenses, 2020)
+	return res
+}
+
+func part2(inputPath string) int {
+	expenses, _ := readLines(inputPath)
+	res, _ := sumOfThreeEqualsTo(expenses, 2020)
+	return res
+}
+
 // ErrNumNotFound is returned if an input list has no two numbers that sum up to the target
 var ErrNumNotFound = errors.New("cannot find two numbers from input that sum to the target")
 
@@ -53,13 +74,4 @@ func sumOfThreeEqualsTo(numbers []int, target int) (int, error) {
 		}
 	}
 	return 0, ErrNumNotFound
-}
-
-func main() {
-	expenses, _ := readLines("./day_01/input.txt")
-
-	res1, _ := sumOfTwoEqualsTo(expenses, 2020)
-	fmt.Println(res1)
-	res2, _ := sumOfThreeEqualsTo(expenses, 2020)
-	fmt.Println(res2)
 }
