@@ -24,69 +24,58 @@ func Part1(inputPath string) int {
 	programCounter := 0
 	acc := 0
 
-	for {
-		if !instructionsExecuted[programCounter] {
-			instructionsExecuted[programCounter] = true
+	for !instructionsExecuted[programCounter] {
+		instructionsExecuted[programCounter] = true
 
-			instruction := instructions[programCounter][:3]
-			argument := toInt(instructions[programCounter][4:])
+		instruction := instructions[programCounter][:3]
+		argument := toInt(instructions[programCounter][4:])
 
-			programCounter, acc = runInstruction(programCounter, acc, instruction, argument)
-
-		} else {
-			return acc
-		}
-
+		programCounter, acc = runInstruction(programCounter, acc, instruction, argument)
 	}
+	return acc
 }
 
 func Part2(inputPath string) int {
 	instructions := strings.Split(readRaw(inputPath), "\n")
 
 	// iterate over codebase to change nop to jmp and inverse
-	for ind, _ := range instructions {
+	for ind := range instructions {
 		instructionsExecuted := make(map[int]bool)
-
 		programCounter := 0
 		acc := 0
 
+		// run the program if the instruction at the current index is nop or jmp
 		if instructions[ind][:3] == "nop" || instructions[ind][:3] == "jmp" {
-			// execute program
-			for {
-				if !instructionsExecuted[programCounter] {
-					// mark instruction as ran
-					instructionsExecuted[programCounter] = true
+			// execute program while there's no infinite loop
+			for !instructionsExecuted[programCounter] {
+				// mark instruction as ran
+				instructionsExecuted[programCounter] = true
 
-					// execute command
-					instruction := instructions[programCounter][:3]
-					argument := toInt(instructions[programCounter][4:])
+				// execute command
+				instruction := instructions[programCounter][:3]
+				argument := toInt(instructions[programCounter][4:])
 
-					// make the swap
-					if programCounter == ind {
-						switch instruction {
-						case "nop":
-							instruction = "jmp"
-						case "jmp":
-							instruction = "nop"
-						}
-
+				// make the swap
+				if programCounter == ind {
+					switch instruction {
+					case "nop":
+						instruction = "jmp"
+					case "jmp":
+						instruction = "nop"
 					}
 
-					programCounter, acc = runInstruction(programCounter, acc, instruction, argument)
-
-					// check if program terminated
-					if programCounter >= len(instructions) {
-						return acc
-					}
-				} else {
-					// infinite loop reached
-					break
 				}
 
+				programCounter, acc = runInstruction(programCounter, acc, instruction, argument)
+
+				// check if program terminated
+				if programCounter >= len(instructions) {
+					return acc
+				}
 			}
 		}
 	}
-	return 1
+	return 0
 }
 
 func runInstruction(programCounter, acc int, instruction string, argument int) (int, int) {
