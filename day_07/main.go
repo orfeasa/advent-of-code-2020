@@ -11,20 +11,20 @@ import (
 func main() {
 	inputPath := "./day_07/input.txt"
 	fmt.Println("--- Part One ---")
-	fmt.Println(Part1(inputPath))
+	fmt.Println(part1(inputPath))
 
 	fmt.Println("--- Part Two ---")
-	fmt.Println(Part2(inputPath))
+	fmt.Println(part2(inputPath))
 }
 
-func Part1(inputPath string) int {
+func part1(inputPath string) int {
 	bagContains := parseRules(readRaw(inputPath))
 
 	bagIsContainedBy := make(map[string][]string)
 
 	// reverse map
 	for k1, v1 := range bagContains {
-		for k2, _ := range v1 {
+		for k2 := range v1 {
 			bagIsContainedBy[k2] = append(bagIsContainedBy[k2], k1)
 		}
 	}
@@ -46,7 +46,7 @@ func Part1(inputPath string) int {
 	return len(bagsFound)
 }
 
-func Part2(inputPath string) int {
+func part2(inputPath string) int {
 	bagContains := parseRules(readRaw(inputPath))
 	return countBagsContainedIn("shiny gold", bagContains) - 1
 }

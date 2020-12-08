@@ -10,13 +10,13 @@ import (
 func main() {
 	inputPath := "./day_08/input.txt"
 	fmt.Println("--- Part One ---")
-	fmt.Println(Part1(inputPath))
+	fmt.Println(part1(inputPath))
 
 	fmt.Println("--- Part Two ---")
-	fmt.Println(Part2(inputPath))
+	fmt.Println(part2(inputPath))
 }
 
-func Part1(inputPath string) int {
+func part1(inputPath string) int {
 	instructions := strings.Split(readRaw(inputPath), "\n")
 
 	instructionsExecuted := make(map[int]bool)
@@ -35,7 +35,7 @@ func Part1(inputPath string) int {
 	return acc
 }
 
-func Part2(inputPath string) int {
+func part2(inputPath string) int {
 	instructions := strings.Split(readRaw(inputPath), "\n")
 
 	// iterate over codebase to change nop to jmp and inverse
@@ -63,7 +63,6 @@ func Part2(inputPath string) int {
 					case "jmp":
 						instruction = "nop"
 					}
-
 				}
 
 				programCounter, acc = runInstruction(programCounter, acc, instruction, argument)

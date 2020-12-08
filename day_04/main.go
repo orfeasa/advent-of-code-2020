@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -10,21 +11,19 @@ import (
 
 func main() {
 	inputPath := "./day_04/input.txt"
-	lines := readLines(inputPath)
+	lines := readRaw(inputPath)
+	passports := strings.Split(lines, "\n\n")
 
-	fmt.Println(countValidPassports(lines))
+	fmt.Println(countValidPassports(passports))
 }
 
-func countValidPassports(lines []string) int {
+func countValidPassports(passports []string) int {
 	fields := make(map[string]string)
-
 	countValid := 0
-
-	passports := strings.Split(lines, "\n\n")
 
 	for _, passport := range passports {
 		passportData := strings.ReplaceAll(passport, "\n", " ")
-		fieldsAndValues := strings.Split(line, " ")
+		fieldsAndValues := strings.Split(passportData, " ")
 		for _, fieldAndValue := range fieldsAndValues {
 			fieldValue := strings.Split(fieldAndValue, ":")
 			fields[fieldValue[0]] = fieldValue[1]
@@ -37,23 +36,6 @@ func countValidPassports(lines []string) int {
 		fields = make(map[string]string)
 	}
 
-	for _, line := range lines {
-		// if line is not empty (we are reading passport data)
-		if line != "" {
-			fieldsAndValues := strings.Split(line, " ")
-			for _, fieldAndValue := range fieldsAndValues {
-				fieldValue := strings.Split(fieldAndValue, ":")
-				fields[fieldValue[0]] = fieldValue[1]
-			}
-		} else {
-			if isValidPassport(fields) {
-				// increase count of valid passports
-				countValid++
-			}
-			// reset fields
-			fields = make(map[string]string)
-		}
-	}
 	return countValid
 }
 
@@ -118,6 +100,13 @@ func isValidPassport(fields map[string]string) bool {
 	}
 
 	return true
+}
+
+// readRaw returns the content of a text file as a string
+func readRaw(filename string) string {
+	content, err := ioutil.ReadFile(filename)
+	check(err)
+	return strings.TrimRight(string(content), "\n")
 }
 
 func readLines(filename string) []string {

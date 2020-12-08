@@ -1,9 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
+	"io/ioutil"
 	"strings"
 	"sync"
 )
@@ -11,14 +10,15 @@ import (
 func main() {
 
 	inputPath := "./day_03/input.txt"
-	slopes := [][]int{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}}
+	lines := strings.Split(readRaw(inputPath), "\n")
 
-	lines := readLines(inputPath)
+	slopes := [][]int{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}}
 
 	treesMultiplied := 1
 	var wg sync.WaitGroup
-	wg.Add(len(slopes))
+
 	for _, slope := range slopes {
+		wg.Add(1)
 		go func(slope []int) {
 			defer wg.Done()
 			treesMultiplied *= countTreesInPath(lines, slope[0], slope[1])
@@ -49,18 +49,11 @@ func countTreesInPath(mapOfTrees []string, right, down int) int {
 	return countTrees
 }
 
-func readLines(filename string) []string {
-	file, err := os.Open(filename)
+// readRaw returns the content of a text file as a string
+func readRaw(filename string) string {
+	content, err := ioutil.ReadFile(filename)
 	check(err)
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	var lines []string
-	for scanner.Scan() {
-		lines = append(lines, strings.TrimSuffix(scanner.Text(), "\n"))
-	}
-	return lines
+	return strings.TrimRight(string(content), "\n")
 }
 
 func check(err error) {
