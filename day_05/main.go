@@ -10,21 +10,36 @@ import (
 
 func main() {
 	inputPath := "./day_05/input.txt"
+	fmt.Println("--- Part One ---")
+	fmt.Println(part1(inputPath))
+
+	fmt.Println("--- Part Two ---")
+	fmt.Println(part2(inputPath))
+}
+
+func part1(inputPath string) int {
 	lines := readLines(inputPath)
 
-	var seatList []int
 	maxSeatID := 0
 	for _, line := range lines {
 		currentSeat := calculateSeatID(line)
-		seatList = append(seatList, currentSeat)
 		maxSeatID = max(maxSeatID, currentSeat)
 	}
-	fmt.Println(maxSeatID)
-	fmt.Println(findMissingSeat(seatList))
+	return maxSeatID
+}
+
+func part2(inputPath string) int {
+	lines := readLines(inputPath)
+
+	var seatList []int
+	for _, line := range lines {
+		currentSeat := calculateSeatID(line)
+		seatList = append(seatList, currentSeat)
+	}
+	return findMissingSeat(seatList)
 }
 
 func findMissingSeat(seatList []int) int {
-
 	// to find the missing seat we will add up all the seats
 	// and find the min value. The missing value is equal to the sum
 	// of what the value would have been if all values were present
