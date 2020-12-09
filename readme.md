@@ -14,3 +14,4 @@ This year I am doing it in Go.
 |[06](https://adventofcode.com/2020/day/6)|Custom Customs|⭐⭐|
 |[07](https://adventofcode.com/2020/day/7)|Handy Haversacks|⭐⭐|
 |[08](https://adventofcode.com/2020/day/8)|Handheld Halting|⭐⭐|
+|[09](https://adventofcode.com/2020/day/8)|Encoding Error|⭐|
