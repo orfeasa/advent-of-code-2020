@@ -40,10 +40,13 @@ func part2(inputPath string) int {
 }
 
 func continuousSubsetSum(numbers []int, target int) []int {
-
+	// holds the current set
 	var currentNumbers []int
+	// low, high point to the index in numbers of the lowest and highest value in currentNumbers
 	low := 0
 	high := 0
+
+	// accumulator and currentNumbers initialized to hold the first value of numbers
 	acc := numbers[high]
 	currentNumbers = append(currentNumbers, numbers[high])
 
@@ -51,6 +54,10 @@ func continuousSubsetSum(numbers []int, target int) []int {
 		for acc < target {
 			// keep adding to current numbers until currentSum >= target
 			high++
+			// check for out of bounds
+			if high >= len(numbers) {
+				return nil
+			}
 			acc += numbers[high]
 			currentNumbers = append(currentNumbers, numbers[high])
 		}
@@ -59,13 +66,12 @@ func continuousSubsetSum(numbers []int, target int) []int {
 			return numbers[low : high+1]
 		}
 
-		if acc > target {
-			for acc > target {
-				// keep removing elements from the beginning until currentSum < target
-				acc -= numbers[low]
-				currentNumbers = currentNumbers[1:]
-				low++
-			}
+		for acc > target {
+			// keep removing elements from the beginning until currentSum =< target
+			acc -= numbers[low]
+			currentNumbers = currentNumbers[1:]
+			low++
+			// TODO check if low == high
 		}
 	}
 }
