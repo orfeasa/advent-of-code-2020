@@ -22,39 +22,19 @@ func part1(inputPath string) int {
 	lines := readRaw(inputPath)
 	passports := strings.Split(lines, "\n\n")
 
-	return countCompletePassports(passports)
+	return countValidPassports(passports, hasAllMandatoryFields)
 }
 
 func part2(inputPath string) int {
 	lines := readRaw(inputPath)
 	passports := strings.Split(lines, "\n\n")
 
-	return countValidPassports(passports)
+	return countValidPassports(passports, allFieldsAreValid)
 }
 
-func countCompletePassports(passports []string) int {
-	fields := make(map[string]string)
-	countComplete := 0
+type validator func(map[string]string) bool
 
-	for _, passport := range passports {
-		passportData := strings.ReplaceAll(passport, "\n", " ")
-		fieldsAndValues := strings.Split(passportData, " ")
-		for _, fieldAndValue := range fieldsAndValues {
-			fieldValue := strings.Split(fieldAndValue, ":")
-			fields[fieldValue[0]] = fieldValue[1]
-		}
-		if isCompletePassport(fields) {
-			// increase count of valid passports
-			countComplete++
-		}
-		// reset fields
-		fields = make(map[string]string)
-	}
-
-	return countComplete
-}
-
-func countValidPassports(passports []string) int {
+func countValidPassports(passports []string, isValid validator) int {
 	fields := make(map[string]string)
 	countValid := 0
 
@@ -65,7 +45,7 @@ func countValidPassports(passports []string) int {
 			fieldValue := strings.Split(fieldAndValue, ":")
 			fields[fieldValue[0]] = fieldValue[1]
 		}
-		if isValidPassport(fields) {
+		if isValid(fields) {
 			// increase count of valid passports
 			countValid++
 		}
@@ -76,12 +56,12 @@ func countValidPassports(passports []string) int {
 	return countValid
 }
 
-func isCompletePassport(fields map[string]string) bool {
+func hasAllMandatoryFields(fields map[string]string) bool {
 	_, cidInFields := fields["cid"]
 	return len(fields) == 8 || (len(fields) == 7 && !cidInFields)
 }
 
-func isValidPassport(fields map[string]string) bool {
+func allFieldsAreValid(fields map[string]string) bool {
 	// validate birth year
 	if val, ok := fields["byr"]; !ok || len(val) != 4 || toInt(val) < 1920 || toInt(val) > 2002 {
 		return false
