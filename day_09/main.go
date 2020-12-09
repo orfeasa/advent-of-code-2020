@@ -19,12 +19,12 @@ func main() {
 }
 
 func part1(inputPath string) int {
-	xmas_data := readNumbers(inputPath)
+	xmasData := readNumbers(inputPath)
 	preamble := 25
 
-	for ind, val := range xmas_data {
+	for ind, val := range xmasData {
 		if ind >= preamble {
-			if !isValidXmasNumber(val, xmas_data[ind-preamble:ind]) {
+			if !isValidXmasNumber(val, xmasData[ind-preamble:ind]) {
 				return val
 			}
 		}
@@ -34,16 +34,47 @@ func part1(inputPath string) int {
 }
 
 func part2(inputPath string) int {
-	return 0
+	xmasData := readNumbers(inputPath)
+	subset := continuousSubsetSum(xmasData, part1(inputPath))
+	return min(subset) + max(subset)
+}
+
+func continuousSubsetSum(numbers []int, target int) []int {
+
+	var currentNumbers []int
+	low := 0
+	high := 0
+	acc := numbers[high]
+	currentNumbers = append(currentNumbers, numbers[high])
+
+	for {
+		for acc < target {
+			// keep adding to current numbers until currentSum >= target
+			high++
+			acc += numbers[high]
+			currentNumbers = append(currentNumbers, numbers[high])
+		}
+
+		if acc == target {
+			return numbers[low : high+1]
+		}
+
+		if acc > target {
+			for acc > target {
+				// keep removing elements from the beginning until currentSum < target
+				acc -= numbers[low]
+				currentNumbers = currentNumbers[1:]
+				low++
+			}
+		}
+	}
 }
 
 // isValidXmasNumber checks if the last number in the slice is
 // equal to the sum of any two numbers in that slice
 func isValidXmasNumber(target int, rangeToCheck []int) bool {
-
 	// iterate over slice
 	for ind1, val1 := range rangeToCheck {
-
 		// check if target - val1 is in the rest of the slice
 		for _, val2 := range rangeToCheck[ind1+1:] {
 			if val1+val2 == target {
@@ -84,4 +115,26 @@ func toInt(s string) int {
 	result, err := strconv.Atoi(s)
 	check(err)
 	return result
+}
+
+// Max returns the larger of x or y.
+func max(numbers []int) int {
+	currMax := numbers[0]
+	for _, val := range numbers {
+		if val > currMax {
+			currMax = val
+		}
+	}
+	return currMax
+}
+
+// Max returns the larger of x or y.
+func min(numbers []int) int {
+	currMin := numbers[0]
+	for _, val := range numbers {
+		if val < currMin {
+			currMin = val
+		}
+	}
+	return currMin
 }
