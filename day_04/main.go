@@ -11,10 +11,47 @@ import (
 
 func main() {
 	inputPath := "./day_04/input.txt"
+	fmt.Println("--- Part One ---")
+	fmt.Println(part1(inputPath))
+
+	fmt.Println("--- Part Two ---")
+	fmt.Println(part2(inputPath))
+}
+
+func part1(inputPath string) int {
 	lines := readRaw(inputPath)
 	passports := strings.Split(lines, "\n\n")
 
-	fmt.Println(countValidPassports(passports))
+	return countCompletePassports(passports)
+}
+
+func part2(inputPath string) int {
+	lines := readRaw(inputPath)
+	passports := strings.Split(lines, "\n\n")
+
+	return countValidPassports(passports)
+}
+
+func countCompletePassports(passports []string) int {
+	fields := make(map[string]string)
+	countComplete := 0
+
+	for _, passport := range passports {
+		passportData := strings.ReplaceAll(passport, "\n", " ")
+		fieldsAndValues := strings.Split(passportData, " ")
+		for _, fieldAndValue := range fieldsAndValues {
+			fieldValue := strings.Split(fieldAndValue, ":")
+			fields[fieldValue[0]] = fieldValue[1]
+		}
+		if isCompletePassport(fields) {
+			// increase count of valid passports
+			countComplete++
+		}
+		// reset fields
+		fields = make(map[string]string)
+	}
+
+	return countComplete
 }
 
 func countValidPassports(passports []string) int {
@@ -37,6 +74,11 @@ func countValidPassports(passports []string) int {
 	}
 
 	return countValid
+}
+
+func isCompletePassport(fields map[string]string) bool {
+	_, cidInFields := fields["cid"]
+	return len(fields) == 8 || (len(fields) == 7 && !cidInFields)
 }
 
 func isValidPassport(fields map[string]string) bool {
