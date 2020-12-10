@@ -4,6 +4,8 @@
 
 This year I am doing it in Go.
 
+## Overview
+
 |Day|Name|Stars|
 |---|---|---|
 |[01](https://adventofcode.com/2020/day/1)|Report Repair|⭐⭐|
@@ -16,3 +18,19 @@ This year I am doing it in Go.
 |[08](https://adventofcode.com/2020/day/8)|Handheld Halting|⭐⭐|
 |[09](https://adventofcode.com/2020/day/9)|Encoding Error|⭐⭐|
 |[10](https://adventofcode.com/2020/day/10)|Adapter Array|⭐⭐|
+
+## Running locally
+
+To run the code of a specific day, make sure you have Go installed](https://golang.org/doc/install) and from within the repo directory run the following, replacing `XX` with the day number, `01` - `24`:
+
+```sh
+go run day_XX/main.go
+```
+
+To run the code of all days run the script:
+
+```sh
+./run_all.sh
+```
+
+Make sure you have ginen permission to execute (`chmod +x run_all.sh`).
