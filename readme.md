@@ -23,7 +23,7 @@ This year I am doing it in Go.
 
 ## Running the code
 
-To run the code of a specific day, make sure you have Go installed](https://golang.org/doc/install) and from within the repo directory run the following, replacing `XX` with the day number, `01` - `24`:
+To run the code of a specific day, make sure you [have Go installed](https://golang.org/doc/install) and from within the repo directory run the following, replacing `XX` with the day number, `01` - `24`:
 
 ```sh
 go run day_XX/main.go
