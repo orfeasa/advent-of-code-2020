@@ -35,7 +35,7 @@ To run the code of all days run the script:
 ./run_all.sh
 ```
 
-Make sure you have ginen permission to execute (`chmod +x run_all.sh`).
+Make sure you have given permission to execute (`chmod +x run_all.sh`).
 
 ## License
 
