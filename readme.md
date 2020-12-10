@@ -1,4 +1,6 @@
-# My Advent of Code 2020 solutions
+# 🎄 Advent of Code 2020 🎄
+
+## Summary
 
 [Advent of Code](http://adventofcode.com/) is an annual Advent calendar of programming puzzles.
 
@@ -19,7 +21,7 @@ This year I am doing it in Go.
 |[09](https://adventofcode.com/2020/day/9)|Encoding Error|⭐⭐|
 |[10](https://adventofcode.com/2020/day/10)|Adapter Array|⭐⭐|
 
-## Running locally
+## Running the code
 
 To run the code of a specific day, make sure you have Go installed](https://golang.org/doc/install) and from within the repo directory run the following, replacing `XX` with the day number, `01` - `24`:
 
