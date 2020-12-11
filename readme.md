@@ -20,6 +20,7 @@ This year I am doing it in Go.
 |[08](https://adventofcode.com/2020/day/8)|Handheld Halting|⭐⭐|
 |[09](https://adventofcode.com/2020/day/9)|Encoding Error|⭐⭐|
 |[10](https://adventofcode.com/2020/day/10)|Adapter Array|⭐⭐|
+|[11](https://adventofcode.com/2020/day/11)|Seating System|⭐⭐|
 
 ## Running the code
 
