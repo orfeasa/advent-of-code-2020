@@ -36,7 +36,3 @@ To run the code of all days run the script:
 ```
 
 Make sure you have given permission to execute (`chmod +x run_all.sh`).
-
-## License
-
-All content is licensed under the terms of the MIT open source license. For more information, read the [LICENSE](LICENSE) file.
