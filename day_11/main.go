@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-	"strconv"
 	"strings"
 )
 
@@ -51,7 +50,6 @@ func runRulesUntilEquilibrium(currSeats [][]int, rules ruleset) [][]int {
 		}
 	}
 	return currSeats
-
 }
 
 func runRoundOfRules(seats [][]int, rules ruleset) [][]int {
@@ -114,9 +112,7 @@ func countVisibleOccupied(y, x int, seats [][]int) int {
 					if currX > maxX || currY > maxY || currX < 0 || currY < 0 {
 						break
 					}
-					// found occupied
 					if isOccupied(seats[currY][currX]) {
-						// DEBUG
 						count++
 						break
 					} else if isEmpty(seats[currY][currX]) {
@@ -126,7 +122,6 @@ func countVisibleOccupied(y, x int, seats [][]int) int {
 			}
 		}
 	}
-
 	return count
 }
 
@@ -181,6 +176,7 @@ func isEmpty(seat int) bool {
 func isOccupied(seat int) bool {
 	return seat == 1
 }
+
 func convertLayoutToInts(textLayout []string) [][]int {
 	var intLayout [][]int
 
@@ -202,9 +198,9 @@ func convertLayoutToInts(textLayout []string) [][]int {
 		intLayout = append(intLayout, newRow)
 	}
 	return intLayout
-
 }
 
+// printSeats is used for debug purposes
 func printSeats(seats [][]int) {
 	for ind1, val1 := range seats {
 		for ind2 := range val1 {
@@ -223,7 +219,6 @@ func printSeats(seats [][]int) {
 		fmt.Println()
 	}
 	fmt.Println()
-
 }
 
 func readStrings(filename string) []string {
@@ -244,10 +239,4 @@ func check(err error) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func toInt(s string) int {
-	result, err := strconv.Atoi(s)
-	check(err)
-	return result
 }
