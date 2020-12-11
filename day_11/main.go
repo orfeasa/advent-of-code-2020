@@ -101,14 +101,12 @@ func countVisibleOccupied(y, x int, seats [][]int) int {
 
 	for dx := -1; dx <= 1; dx++ {
 		for dy := -1; dy <= 1; dy++ {
-			// should not be the actual
 			if !(dx == 0 && dy == 0) {
 				currX := x
 				currY := y
 				for {
 					currX += dx
 					currY += dy
-					// out of bounds
 					if currX > maxX || currY > maxY || currX < 0 || currY < 0 {
 						break
 					}
@@ -143,11 +141,9 @@ func getValidAdjacentSeats(y, x int, seats [][]int) []int {
 
 	for dx := -1; dx <= 1; dx++ {
 		for dy := -1; dy <= 1; dy++ {
-			// should not be the actual
 			if !(dx == 0 && dy == 0) {
 				newX := x + dx
 				newY := y + dy
-				// if they are not out of bounds
 				if (newX >= 0 && newX <= maxX) && (newY >= 0 && newY <= maxY) {
 					validSeats = append(validSeats, seats[newY][newX])
 				}
