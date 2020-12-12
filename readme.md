@@ -21,6 +21,8 @@ This year I am doing it in Go.
 |[09](https://adventofcode.com/2020/day/9)|Encoding Error|⭐⭐|
 |[10](https://adventofcode.com/2020/day/10)|Adapter Array|⭐⭐|
 |[11](https://adventofcode.com/2020/day/11)|Seating System|⭐⭐|
+|[12](https://adventofcode.com/2020/day/12)|Rain Risk|⭐⭐|
+
 
 ## Running the code
 
