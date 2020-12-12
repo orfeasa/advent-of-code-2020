@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -37,20 +36,19 @@ func part1(inputPath string) int {
 
 func part2(inputPath string) int {
 	lines := readStrings(inputPath)
-	waypoint := ship{x: 10, y: 1, orientation: 0}
-	// waypoint coordinates are relative to the ship
 	sh := ship{x: 0, y: 0, orientation: 90}
+	// waypoint coordinates are relative to the ship
+	waypoint := ship{x: 10, y: 1, orientation: 0}
 
 	for _, command := range lines {
 		action := command[0]
 		value := toInt(command[1:])
-
 		switch action {
+		case 'N', 'S', 'E', 'W':
+			waypoint = move(waypoint, action, value)
 		case 'F':
 			sh.x += value * waypoint.x
 			sh.y += value * waypoint.y
-		case 'N', 'S', 'E', 'W':
-			waypoint = move(waypoint, action, value)
 		case 'R', 'L':
 			waypoint.x, waypoint.y = rotatePoint(waypoint.x, waypoint.y, action, value)
 		}
@@ -61,8 +59,7 @@ func part2(inputPath string) int {
 func rotatePoint(x, y int, direction byte, deg int) (int, int) {
 	// convert L to R
 	if direction == 'L' {
-		deg = -deg
-		deg += 360
+		deg = 360 - deg
 	}
 
 	// calculate amount of right rotation and apply
@@ -84,17 +81,11 @@ func move(sh ship, action byte, value int) ship {
 	case 'W':
 		sh.x -= value
 	case 'L':
-		sh.orientation -= value
+		sh.orientation += 360 - value
 		sh.orientation %= 360
-		if sh.orientation < 0 {
-			sh.orientation += 360
-		}
 	case 'R':
 		sh.orientation += value
 		sh.orientation %= 360
-		if sh.orientation < 0 {
-			sh.orientation += 360
-		}
 	case 'F':
 		var orientations = [4]byte{'N', 'E', 'S', 'W'}
 		sh = move(sh, orientations[sh.orientation/90], value)
@@ -123,12 +114,6 @@ func abs(x int) int {
 	return x
 }
 
-func readRaw(filename string) string {
-	content, err := ioutil.ReadFile(filename)
-	check(err)
-	return strings.TrimRight(string(content), "\n")
-}
-
 func check(err error) {
 	if err != nil {
 		panic(err)
@@ -139,24 +124,4 @@ func toInt(s string) int {
 	result, err := strconv.Atoi(s)
 	check(err)
 	return result
-}
-
-func max(numbers []int) int {
-	currMax := numbers[0]
-	for _, val := range numbers {
-		if val > currMax {
-			currMax = val
-		}
-	}
-	return currMax
-}
-
-func min(numbers []int) int {
-	currMin := numbers[0]
-	for _, val := range numbers {
-		if val < currMin {
-			currMin = val
-		}
-	}
-	return currMin
 }
