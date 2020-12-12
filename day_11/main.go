@@ -19,83 +19,66 @@ func main() {
 
 func part1(inputPath string) int {
 	textLayout := readStrings(inputPath)
-	currSeats := convertLayoutToInts(textLayout)
-	finalSeats := runRulesUntilEquilibrium(currSeats, adjacentSeatVisibilityRule)
-
+	finalSeats := runRulesUntilEquilibrium(textLayout, adjacentSeatVisibilityRule)
 	return countAllOccupied(finalSeats)
 }
 
 func part2(inputPath string) int {
 	textLayout := readStrings(inputPath)
-	currSeats := convertLayoutToInts(textLayout)
-	finalSeats := runRulesUntilEquilibrium(currSeats, directionalSeatVisibilityRule)
-
+	finalSeats := runRulesUntilEquilibrium(textLayout, directionalSeatVisibilityRule)
 	return countAllOccupied(finalSeats)
 }
 
-type ruleset func(rowNum, colNum int, seats [][]int) int
+type ruleset func(rowNum, colNum int, seats [][]byte) byte
 
-func runRulesUntilEquilibrium(currSeats [][]int, rules ruleset) [][]int {
-	prevSeats := make([][]int, len(currSeats))
+func runRulesUntilEquilibrium(textLayout []string, rules ruleset) [][]byte {
+	var current, next [][]byte
+	for _, line := range textLayout {
+		current = append(current, []byte(line))
+		next = append(next, []byte(line))
+	}
 
 	for {
-		// prevSeats = currSeats
-		for i := range prevSeats {
-			prevSeats[i] = make([]int, len(currSeats[i]))
-			copy(prevSeats[i], currSeats[i])
+		for rowNum, row := range current {
+			for colNum, _ := range row {
+				next[rowNum][colNum] = rules(rowNum, colNum, current)
+			}
 		}
-		currSeats = runRoundOfRules(prevSeats, rules)
-		if reflect.DeepEqual(prevSeats, currSeats) {
+		current, next = next, current
+		if reflect.DeepEqual(current, next) {
 			break
 		}
 	}
-	return currSeats
+	return current
 }
 
-func runRoundOfRules(seats [][]int, rules ruleset) [][]int {
-	newSeats := make([][]int, len(seats))
-	for i := range seats {
-		newSeats[i] = make([]int, len(seats[i]))
-		copy(newSeats[i], seats[i])
-	}
-
-	for rowNum, row := range seats {
-		for colNum, _ := range row {
-			newSeats[rowNum][colNum] = rules(rowNum, colNum, seats)
-		}
-	}
-	return newSeats
-}
-
-func adjacentSeatVisibilityRule(rowNum, colNum int, seats [][]int) int {
+func adjacentSeatVisibilityRule(rowNum, colNum int, seats [][]byte) byte {
 	seat := seats[rowNum][colNum]
 	numOfAdjacentOccupied := countAdjacentOccupied(rowNum, colNum, seats)
 	if isEmpty(seat) && numOfAdjacentOccupied == 0 {
 		// seat becomes occupied
-		return 1
+		return '#'
 	} else if isOccupied(seat) && numOfAdjacentOccupied >= 4 {
 		// seat becomes empty
-		return 0
+		return 'L'
 	}
 	return seat
 }
 
-func directionalSeatVisibilityRule(rowNum, colNum int, seats [][]int) int {
+func directionalSeatVisibilityRule(rowNum, colNum int, seats [][]byte) byte {
 	seat := seats[rowNum][colNum]
 	numOfVisibleOccupied := countVisibleOccupied(rowNum, colNum, seats)
 	if isEmpty(seat) && numOfVisibleOccupied == 0 {
 		// seat becomes occupied
-		return 1
+		return '#'
 	} else if isOccupied(seat) && numOfVisibleOccupied >= 5 {
 		// seat becomes empty
-		return 0
+		return 'L'
 	}
 	return seat
 }
 
-func countVisibleOccupied(y, x int, seats [][]int) int {
-	count := 0
-
+func countVisibleOccupied(y, x int, seats [][]byte) (count int) {
 	maxY := len(seats) - 1
 	maxX := len(seats[0]) - 1
 
@@ -123,21 +106,9 @@ func countVisibleOccupied(y, x int, seats [][]int) int {
 	return count
 }
 
-func countAdjacentOccupied(y, x int, seats [][]int) int {
-	adjacentSeats := getValidAdjacentSeats(y, x, seats)
-	count := 0
-	for _, seat := range adjacentSeats {
-		if isOccupied(seat) {
-			count++
-		}
-	}
-	return count
-}
-
-func getValidAdjacentSeats(y, x int, seats [][]int) []int {
+func countAdjacentOccupied(y, x int, seats [][]byte) (count int) {
 	maxY := len(seats) - 1
 	maxX := len(seats[0]) - 1
-	var validSeats []int
 
 	for dx := -1; dx <= 1; dx++ {
 		for dy := -1; dy <= 1; dy++ {
@@ -145,16 +116,17 @@ func getValidAdjacentSeats(y, x int, seats [][]int) []int {
 				newX := x + dx
 				newY := y + dy
 				if (newX >= 0 && newX <= maxX) && (newY >= 0 && newY <= maxY) {
-					validSeats = append(validSeats, seats[newY][newX])
+					if isOccupied(seats[newY][newX]) {
+						count++
+					}
 				}
 			}
 		}
 	}
-	return validSeats
+	return count
 }
 
-func countAllOccupied(seats [][]int) int {
-	count := 0
+func countAllOccupied(seats [][]byte) (count int) {
 	for _, row := range seats {
 		for _, seat := range row {
 			if isOccupied(seat) {
@@ -165,68 +137,22 @@ func countAllOccupied(seats [][]int) int {
 	return count
 }
 
-func isEmpty(seat int) bool {
-	return seat == 0
-}
+func isEmpty(seat byte) bool { return seat == 'L' }
 
-func isOccupied(seat int) bool {
-	return seat == 1
-}
+func isOccupied(seat byte) bool { return seat == '#' }
 
-func convertLayoutToInts(textLayout []string) [][]int {
-	var intLayout [][]int
-
-	for _, val1 := range textLayout {
-		var newRow []int
-		for _, val2 := range val1 {
-			switch string(val2) {
-			case "L":
-				// empty seat is 0
-				newRow = append(newRow, 0)
-			case "#":
-				// occupied seat is 1
-				newRow = append(newRow, 1)
-			case ".":
-				// floor is -1
-				newRow = append(newRow, -1)
-			}
-		}
-		intLayout = append(intLayout, newRow)
-	}
-	return intLayout
-}
-
-// printSeats is used for debug purposes
-func printSeats(seats [][]int) {
-	for ind1, val1 := range seats {
-		for ind2 := range val1 {
-			switch seats[ind1][ind2] {
-			case 0:
-				// empty seat is 0
-				fmt.Print("L")
-			case 1:
-				// occupied seat is 1
-				fmt.Print("#")
-			case -1:
-				// floor is -1
-				fmt.Print(".")
-			}
-		}
-		fmt.Println()
-	}
-	fmt.Println()
-}
+func isFloor(seat byte) bool { return seat == '.' }
 
 func readStrings(filename string) []string {
 	file, err := os.Open(filename)
 	check(err)
 	defer file.Close()
 
-	Scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(file)
 
 	var text []string
-	for Scanner.Scan() {
-		text = append(text, strings.TrimRight(Scanner.Text(), "\n"))
+	for scanner.Scan() {
+		text = append(text, strings.TrimRight(scanner.Text(), "\n"))
 	}
 	return text
 }
