@@ -123,7 +123,6 @@ func toInt(s string) int {
 	return result
 }
 
-// Max returns the larger of x or y.
 func max(numbers []int) int {
 	currMax := numbers[0]
 	for _, val := range numbers {
@@ -134,7 +133,6 @@ func max(numbers []int) int {
 	return currMax
 }
 
-// Max returns the larger of x or y.
 func min(numbers []int) int {
 	currMin := numbers[0]
 	for _, val := range numbers {
