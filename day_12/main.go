@@ -27,9 +27,7 @@ func part1(inputPath string) int {
 	lines := readStrings(inputPath)
 	sh := ship{x: 0, y: 0, orientation: 90}
 	for _, command := range lines {
-		action := command[0]
-		value := toInt(command[1:])
-		sh = move(sh, action, value)
+		sh = move(sh, command[0], toInt(command[1:]))
 	}
 	return abs(sh.x) + abs(sh.y)
 }
