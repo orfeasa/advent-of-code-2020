@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"strconv"
@@ -70,12 +69,6 @@ func part2(inputPath string) int {
 		}
 	}
 
-	// DEBUG
-	currentMask = "000000000000000000000000000000X1001X"
-	address := 42
-	addresses := maskAddresses(address, currentMask)
-	fmt.Println(addresses)
-
 	acc := 0
 	for _, val := range memory {
 		acc += val
@@ -107,26 +100,42 @@ func maskAddresses(address int, mask string) (addresses []int) {
 		}
 	}
 
-	for _, val := range floating {
+	nextAddress := address
+	for i := 0; i < 1<<len(floating); i++ {
+		binary := strconv.FormatInt(int64(i), 2)
 
-	}
-	for ind, char := range mask {
-		if char == 'X' {
-			fmt.Println("address=", address, ", ind=", ind, "so appending", setBit(address, len(mask)-ind-1), "and", clearBit(address, len(mask)-ind-1))
-			addresses = append(addresses, setBit(address, len(mask)-ind-1))
-			addresses = append(addresses, clearBit(address, len(mask)-ind-1))
+		// prepend zeros
+		binary = padLeft(binary, "0", len(floating))
+		for ind, char := range binary {
+			switch char {
+			case '1':
+				nextAddress = setBit(nextAddress, len(mask)-floating[ind]-1)
+			case '0':
+				nextAddress = clearBit(nextAddress, len(mask)-floating[ind]-1)
+			}
+			addresses = append(addresses, nextAddress)
 		}
 	}
+
 	return addresses
 }
 
-// Sets the bit at pos in the integer n.
+func padLeft(str, pad string, length int) string {
+	for {
+		str = pad + str
+		if len(str) > length {
+			return str[len(str)-length : len(str)]
+		}
+	}
+}
+
+// Sets the bit at pos in the integer n
 func setBit(n int, pos int) int {
 	n |= (1 << pos)
 	return n
 }
 
-// Clears the bit at pos in n.
+// Clears the bit at pos in n
 func clearBit(n int, pos int) int {
 	mask := ^(1 << pos)
 	n &= mask
@@ -147,26 +156,6 @@ func readStrings(filename string) []string {
 	return text
 }
 
-func readNumbers(filename string) []int {
-	file, err := os.Open(filename)
-	check(err)
-	defer file.Close()
-
-	Scanner := bufio.NewScanner(file)
-
-	var numbers []int
-	for Scanner.Scan() {
-		numbers = append(numbers, toInt(Scanner.Text()))
-	}
-	return numbers
-}
-
-func readRaw(filename string) string {
-	content, err := ioutil.ReadFile(filename)
-	check(err)
-	return strings.TrimRight(string(content), "\n")
-}
-
 func check(err error) {
 	if err != nil {
 		panic(err)
@@ -177,24 +166,4 @@ func toInt(s string) int {
 	result, err := strconv.Atoi(s)
 	check(err)
 	return result
-}
-
-func max(numbers []int) int {
-	currMax := numbers[0]
-	for _, val := range numbers {
-		if val > currMax {
-			currMax = val
-		}
-	}
-	return currMax
-}
-
-func min(numbers []int) int {
-	currMin := numbers[0]
-	for _, val := range numbers {
-		if val < currMin {
-			currMin = val
-		}
-	}
-	return currMin
 }
