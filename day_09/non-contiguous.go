@@ -30,9 +30,8 @@ func countSubsetSums(numbers []int, start, target int, memo map[[2]int]int) int 
 	if start >= len(numbers) {
 		if target == 0 {
 			return 1
-		} else {
-			return 0
 		}
+		return 0
 	}
 
 	if _, contains := memo[[2]int{start, target}]; !contains {

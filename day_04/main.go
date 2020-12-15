@@ -78,34 +78,33 @@ func allFieldsAreValid(fields map[string]string) bool {
 	}
 
 	// validate height
-	if val, ok := fields["hgt"]; !ok {
+	val, ok := fields["hgt"]
+	if !ok {
 		return false
-	} else {
-		unit := val[len(val)-2:]
-		// check valid unit
-		if unit != "cm" && unit != "in" {
-			return false
-		}
-		height := toInt(val[:len(val)-2])
-		if unit == "cm" && (height < 150 || height > 193) {
-			return false
-		} else if unit == "in" && (height < 59 || height > 76) {
-			return false
-		}
+	}
+	unit := val[len(val)-2:]
+	// check valid unit
+	if unit != "cm" && unit != "in" {
+		return false
+	}
+	height := toInt(val[:len(val)-2])
+	if unit == "cm" && (height < 150 || height > 193) {
+		return false
+	} else if unit == "in" && (height < 59 || height > 76) {
+		return false
 	}
 
 	// validate hair color
-	if val, ok := fields["hcl"]; !ok {
+	val, ok = fields["hcl"]
+	if !ok {
 		return false
-	} else {
-		if string(val[0]) != "#" {
-			return false
-		}
-		color := val[1:]
-		if _, err := strconv.ParseInt(color, 16, 32); len(color) != 6 || err != nil {
-			return false
-		}
-
+	}
+	if string(val[0]) != "#" {
+		return false
+	}
+	color := val[1:]
+	if _, err := strconv.ParseInt(color, 16, 32); len(color) != 6 || err != nil {
+		return false
 	}
 
 	// validate eye color
