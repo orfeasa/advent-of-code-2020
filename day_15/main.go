@@ -39,21 +39,17 @@ func playGameUntil(limit int, input string) int {
 		if isFirstTime {
 			last = 0
 			// if 0 has been spoken before
-			if _, ok := numbers[0]; ok {
-				isFirstTime = false
-			} else {
-				isFirstTime = true
-			}
+			_, ok := numbers[0]
+			isFirstTime = !ok
 			difference = clock - numbers[0]
 			numbers[0] = clock
 		} else {
 			last = difference
 			// check if last has been spoken before
-			if val, ok := numbers[last]; ok {
-				isFirstTime = false
-				difference = clock - val
-			} else {
-				isFirstTime = true
+			_, ok := numbers[last]
+			isFirstTime = !ok
+			if !isFirstTime {
+				difference = clock - numbers[last]
 			}
 			numbers[last] = clock
 		}
