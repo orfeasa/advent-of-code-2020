@@ -24,6 +24,7 @@ This year I am doing it in Go.
 |[12](https://adventofcode.com/2020/day/12)|Rain Risk|⭐⭐|
 |[13](https://adventofcode.com/2020/day/13)|Shuttle Search|⭐|
 |[14](https://adventofcode.com/2020/day/14)|Docking Data|⭐⭐|
+|[15](https://adventofcode.com/2020/day/15)|Rambunctious Recitation|⭐⭐|
 
 ## Running the code
 
