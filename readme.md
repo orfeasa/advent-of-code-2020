@@ -32,7 +32,7 @@ To run the code of a specific day, make sure you [have Go installed](https://gol
 
 ```sh
 go run day_XX/main.go
-```04
+```
 
 To run the code of all days run the script:
 
