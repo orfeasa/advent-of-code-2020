@@ -40,7 +40,7 @@ func runRulesUntilEquilibrium(textLayout []string, rules ruleset) [][]byte {
 
 	for {
 		for rowNum, row := range current {
-			for colNum, _ := range row {
+			for colNum := range row {
 				next[rowNum][colNum] = rules(rowNum, colNum, current)
 			}
 		}

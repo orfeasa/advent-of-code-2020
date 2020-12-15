@@ -124,7 +124,7 @@ func padLeft(str, pad string, length int) string {
 	for {
 		str = pad + str
 		if len(str) > length {
-			return str[len(str)-length : len(str)]
+			return str[len(str)-length:]
 		}
 	}
 }

@@ -40,4 +40,10 @@ To run the code of all days run the script:
 ./run_all.sh
 ```
 
+## Linting
+
+```sh
+gofmt -s -w .
+```
+
 Make sure you have given permission to execute (`chmod +x run_all.sh`).

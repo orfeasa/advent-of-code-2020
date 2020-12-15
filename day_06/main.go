@@ -54,7 +54,7 @@ func Part2(inputPath string) int {
 		// iterate over each person's answers
 		for _, personAnswers := range personsInGroup {
 			// iterate over the answers in each question
-			for answer, _ := range commonAnswers {
+			for answer := range commonAnswers {
 				if !strings.Contains(personAnswers, answer) {
 					delete(commonAnswers, answer)
 				}
