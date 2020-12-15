@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in $(seq -f "%02g" 1 24)
+for i in $(seq -f "%02g" 1 25)
 do
     FILE="./day_$i/main.go"
     if test -f "$FILE"; then
