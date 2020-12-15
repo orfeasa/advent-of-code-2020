@@ -93,9 +93,8 @@ func power(x, y, m int) int {
 	p = (p * p) % m
 	if y%2 == 0 {
 		return p
-	} else {
-		return ((x * p) % m)
 	}
+	return ((x * p) % m)
 }
 
 func gcd(a, b int) int {

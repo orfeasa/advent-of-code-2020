@@ -1,3 +1,5 @@
+package main
+
 // I initially did't pay attention to the word 'contiguous' in the problem description
 // so I had to solve a much harder problem (and is too slow to solve a problem of the size of the input)
 // nevertheless, here is what I did :p
