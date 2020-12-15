@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"strconv"
@@ -48,24 +47,62 @@ func part1(inputPath string) int {
 func part2(inputPath string) int {
 	input := readStrings(inputPath)
 	busIDs := strings.Split(input[1], ",")
+
 	// need to find t such as for all buses
-	// (t + ind) % bus = 0
-	t := 0
-	for {
-		t++
-		found := true
-		for ind, bus := range busIDs {
-			if bus != "x" && (t+ind)%toInt(bus) != 0 {
-				found = false
-				break
-			}
-		}
-		if found {
-			break
+	// (t + ind(bus)) % bus = 0
+	// https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Search_by_sieving
+	var divisors []int
+	var remainders []int
+	for ind, bus := range busIDs {
+		if bus != "x" {
+			divisors = append(divisors, toInt(bus))
+			remainders = append(remainders, toInt(bus)-ind)
 		}
 	}
+	return chineseRemainderTheorem(remainders, divisors)
+}
 
-	return t
+func chineseRemainderTheorem(remainders, divisors []int) int {
+	N := 1
+	for _, divisor := range divisors {
+		N *= divisor
+	}
+
+	solution := 0
+	for i := range divisors {
+		y := N / divisors[i]
+		// inverse modulo y
+		z := modularInverse(y, divisors[i])
+		solution += remainders[i] * y * z
+	}
+	return solution % N
+}
+
+func modularInverse(a, m int) int {
+	if gcd(a, m) == 1 {
+		return power(a, m-2, m)
+	}
+	return -1
+}
+
+func power(x, y, m int) int {
+	if y == 0 {
+		return 1
+	}
+	p := power(x, y/2, m) % m
+	p = (p * p) % m
+	if y%2 == 0 {
+		return p
+	} else {
+		return ((x * p) % m)
+	}
+}
+
+func gcd(a, b int) int {
+	if a == 0 {
+		return b
+	}
+	return gcd(b%a, a)
 }
 
 func readStrings(filename string) []string {
@@ -82,26 +119,6 @@ func readStrings(filename string) []string {
 	return text
 }
 
-func readNumbers(filename string) []int {
-	file, err := os.Open(filename)
-	check(err)
-	defer file.Close()
-
-	Scanner := bufio.NewScanner(file)
-
-	var numbers []int
-	for Scanner.Scan() {
-		numbers = append(numbers, toInt(Scanner.Text()))
-	}
-	return numbers
-}
-
-func readRaw(filename string) string {
-	content, err := ioutil.ReadFile(filename)
-	check(err)
-	return strings.TrimRight(string(content), "\n")
-}
-
 func check(err error) {
 	if err != nil {
 		panic(err)
@@ -112,24 +129,4 @@ func toInt(s string) int {
 	result, err := strconv.Atoi(s)
 	check(err)
 	return result
-}
-
-func max(numbers []int) int {
-	currMax := numbers[0]
-	for _, val := range numbers {
-		if val > currMax {
-			currMax = val
-		}
-	}
-	return currMax
-}
-
-func min(numbers []int) int {
-	currMin := numbers[0]
-	for _, val := range numbers {
-		if val < currMin {
-			currMin = val
-		}
-	}
-	return currMin
 }

@@ -22,7 +22,7 @@ This year I am doing it in Go.
 |[10](https://adventofcode.com/2020/day/10)|Adapter Array|⭐⭐|
 |[11](https://adventofcode.com/2020/day/11)|Seating System|⭐⭐|
 |[12](https://adventofcode.com/2020/day/12)|Rain Risk|⭐⭐|
-|[13](https://adventofcode.com/2020/day/13)|Shuttle Search|⭐|
+|[13](https://adventofcode.com/2020/day/13)|Shuttle Search|⭐⭐|
 |[14](https://adventofcode.com/2020/day/14)|Docking Data|⭐⭐|
 |[15](https://adventofcode.com/2020/day/15)|Rambunctious Recitation|⭐⭐|
 
