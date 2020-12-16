@@ -47,7 +47,7 @@ func part2(inputPath string) int {
 		}
 	}
 
-	// field candidates contains for each field index which rules are valid for it
+	// fieldCandidates[5] = {2, 3, 4} means the 5th field is valid for rules 2, 3 and 4
 	fieldCandidates := make(map[int][]int)
 	for ruleInd, rule := range rules {
 		for fieldPos := 0; fieldPos < len(tickets[0]); fieldPos++ {
@@ -58,6 +58,7 @@ func part2(inputPath string) int {
 					break
 				}
 			}
+			// if the flag has not been changed, add the rule to the field
 			if fieldIsValid {
 				fieldCandidates[fieldPos] = append(fieldCandidates[fieldPos], ruleInd)
 			}
@@ -67,7 +68,7 @@ func part2(inputPath string) int {
 	// until there are no candidates left without a field
 	for len(fieldCandidates) != 0 {
 		for fieldPos, possibleRules := range fieldCandidates {
-			// if there's only one possibility
+			// if there's only one possibility for a rule to validate a field
 			if len(possibleRules) == 1 {
 				rules[possibleRules[0]].pos = fieldPos
 				fieldCandidates = removeKeyFromMap(fieldCandidates, possibleRules[0])
@@ -75,6 +76,7 @@ func part2(inputPath string) int {
 		}
 	}
 
+	// multiply fields that start with the word "departure"
 	acc := 1
 	for _, rule := range rules {
 		if strings.HasPrefix(rule.name, "departure") {
