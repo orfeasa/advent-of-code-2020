@@ -25,6 +25,7 @@ This year I am doing it in Go.
 | [13](https://adventofcode.com/2020/day/13) | Shuttle Search          | ⭐⭐    |
 | [14](https://adventofcode.com/2020/day/14) | Docking Data            | ⭐⭐    |
 | [15](https://adventofcode.com/2020/day/15) | Rambunctious Recitation | ⭐⭐    |
+| [16](https://adventofcode.com/2020/day/16) | Ticket Translation      | ⭐⭐    |
 
 ## Running the code
 
@@ -45,5 +46,6 @@ Make sure you have given permission to execute (`chmod +x run_all.sh`).
 ## Linting
 
 ```sh
-gofmt -s -w . && golint
+gofmt -s -w . 
+git ls-files | grep .go | xargs golint
 ```
