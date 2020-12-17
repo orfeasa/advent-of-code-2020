@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -58,17 +56,29 @@ func part2(inputPath string) int {
 
 func runCycle(cubesActive map[[3]int]bool) (nextCubesActive map[[3]int]bool) {
 	nextCubesActive = make(map[[3]int]bool)
-	for coord, isActive := range cubesActive {
-		activeNeighborsCount := countActiveNeighbors(coord, cubesActive)
-		if isActive && (activeNeighborsCount == 2 || activeNeighborsCount == 3) {
-			nextCubesActive[coord] = true
-		} else if !isActive && activeNeighborsCount == 3 {
-			nextCubesActive[coord] = true
-		} else {
-			nextCubesActive[coord] = false
+	var neighborsQueue [][3]int
+	for coord := range cubesActive {
+		neighborsQueue = append(neighborsQueue, getNeighbors(coord)...)
+		nextCubesActive[coord] = calcNextState(coord, cubesActive)
+	}
+	for _, neighborCoords := range neighborsQueue {
+		// if the next state is not already calculated before
+		if _, ok := nextCubesActive[neighborCoords]; !ok {
+			nextCubesActive[neighborCoords] = calcNextState(neighborCoords, cubesActive)
 		}
 	}
 	return nextCubesActive
+}
+
+func calcNextState(coord [3]int, cubesActive map[[3]int]bool) bool {
+	isActive := cubesActive[coord]
+	activeNeighborsCount := countActiveNeighbors(coord, cubesActive)
+	if isActive && (activeNeighborsCount == 2 || activeNeighborsCount == 3) {
+		return true
+	} else if !isActive && activeNeighborsCount == 3 {
+		return true
+	}
+	return false
 }
 
 func countActiveNeighbors(coord [3]int, cubesActive map[[3]int]bool) int {
@@ -96,34 +106,6 @@ func getNeighbors(coord [3]int) (neighbors [][3]int) {
 	return neighbors
 }
 
-func readStrings(filename string) []string {
-	file, err := os.Open(filename)
-	check(err)
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	var text []string
-	for scanner.Scan() {
-		text = append(text, strings.TrimRight(scanner.Text(), "\n"))
-	}
-	return text
-}
-
-func readNumbers(filename string) []int {
-	file, err := os.Open(filename)
-	check(err)
-	defer file.Close()
-
-	Scanner := bufio.NewScanner(file)
-
-	var numbers []int
-	for Scanner.Scan() {
-		numbers = append(numbers, toInt(Scanner.Text()))
-	}
-	return numbers
-}
-
 func readRaw(filename string) string {
 	content, err := ioutil.ReadFile(filename)
 	check(err)
@@ -140,24 +122,4 @@ func toInt(s string) int {
 	result, err := strconv.Atoi(s)
 	check(err)
 	return result
-}
-
-func max(numbers []int) int {
-	currMax := numbers[0]
-	for _, val := range numbers {
-		if val > currMax {
-			currMax = val
-		}
-	}
-	return currMax
-}
-
-func min(numbers []int) int {
-	currMin := numbers[0]
-	for _, val := range numbers {
-		if val < currMin {
-			currMin = val
-		}
-	}
-	return currMin
 }
