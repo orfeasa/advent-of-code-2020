@@ -20,9 +20,8 @@ func main() {
 
 func part1(inputPath string) int {
 	input := readStrings(inputPath)
-	earliestTime := toInt(input[0])
-
 	busIDs := strings.Split(input[1], ",")
+	earliestTime := toInt(input[0])
 
 	minTime := 0
 	minBus := 0
@@ -47,10 +46,6 @@ func part1(inputPath string) int {
 func part2(inputPath string) int {
 	input := readStrings(inputPath)
 	busIDs := strings.Split(input[1], ",")
-
-	// need to find t such as for all buses
-	// (t + ind(bus)) % bus = 0
-	// https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Search_by_sieving
 	var divisors []int
 	var remainders []int
 	for ind, bus := range busIDs {
