@@ -1,5 +1,8 @@
 # 🎄 Advent of Code 2020 🎄
 
+
+![AoC2020 logo](https://raw.githubusercontent.com/orfeasa/advent-of-code-2020/main/header.png)
+
 ## Summary
 
 [Advent of Code](http://adventofcode.com/) is an annual Advent calendar of programming puzzles.
