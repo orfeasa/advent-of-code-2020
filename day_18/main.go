@@ -51,44 +51,38 @@ func evaluateExpression(expression string, precedence precedenceEvaluator) int {
 		} else if token == ')' {
 			// 	While the thing on top of the operator stack is not a left parenthesis
 			for operatorStack[len(operatorStack)-1] != '(' {
-				operator := operatorStack[len(operatorStack)-1]
-				operatorStack = operatorStack[:len(operatorStack)-1]
-
-				operands := [2]int{valueStack[len(valueStack)-1], valueStack[len(valueStack)-2]}
-				valueStack = valueStack[:len(valueStack)-2]
-
-				result := applyOp(operands, operator)
-				valueStack = append(valueStack, result)
+				operatorStack, valueStack = executeOperation(operatorStack, valueStack)
 			}
 			// discard left parenthesis from the operator stack
 			operatorStack = operatorStack[:len(operatorStack)-1]
 		} else { //operator
 			thisOp := token
 			for len(operatorStack) != 0 && precedence(operatorStack[len(operatorStack)-1]) >= precedence(thisOp) {
-				operator := operatorStack[len(operatorStack)-1]
-				operatorStack = operatorStack[:len(operatorStack)-1]
-
-				operands := [2]int{valueStack[len(valueStack)-1], valueStack[len(valueStack)-2]}
-				valueStack = valueStack[:len(valueStack)-2]
-
-				result := applyOp(operands, operator)
-				valueStack = append(valueStack, result)
+				operatorStack, valueStack = executeOperation(operatorStack, valueStack)
 			}
 			operatorStack = append(operatorStack, thisOp)
 		}
 	}
 	for len(operatorStack) != 0 {
-		operator := operatorStack[len(operatorStack)-1]
-		operatorStack = operatorStack[:len(operatorStack)-1]
-
-		operands := [2]int{valueStack[len(valueStack)-1], valueStack[len(valueStack)-2]}
-		valueStack = valueStack[:len(valueStack)-2]
-
-		result := applyOp(operands, operator)
-		valueStack = append(valueStack, result)
+		operatorStack, valueStack = executeOperation(operatorStack, valueStack)
 	}
 	// The result is the only value left in the value stack
 	return valueStack[0]
+}
+
+func executeOperation(operatorStack []rune, valueStack []int) ([]rune, []int) {
+	// pop operator
+	operator := operatorStack[len(operatorStack)-1]
+	operatorStack = operatorStack[:len(operatorStack)-1]
+
+	// pop operands
+	operands := [2]int{valueStack[len(valueStack)-1], valueStack[len(valueStack)-2]}
+	valueStack = valueStack[:len(valueStack)-2]
+
+	// execute apply operator and push result to the value stack
+	result := applyOp(operands, operator)
+	valueStack = append(valueStack, result)
+	return operatorStack, valueStack
 }
 
 func applyOp(operands [2]int, operator rune) int {
