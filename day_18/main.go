@@ -37,78 +37,57 @@ func part2(inputPath string) int {
 
 type precedenceEvaluator func(operator rune) int
 
-// https://www.geeksforgeeks.org/expression-evaluation/
+// Implementation of the Shunting-yard algorithm as explained here https://www.geeksforgeeks.org/expression-evaluation/
 func evaluateExpression(expression string, precedence precedenceEvaluator) int {
 	// remove all spaces
 	expression = strings.ReplaceAll(expression, " ", "")
 	var valueStack []int
 	var operatorStack []rune
-	// 1. While there are still tokens to be read in,
 	for _, token := range expression {
-		// 	1.1 Get the next token.
-		// 	1.2 If the token is:
-		// 		1.2.1 A number: push it onto the value stack.
-		// 		1.2.2 A variable: get its value, and push onto the value stack.
 		if unicode.IsDigit(token) {
 			valueStack = append(valueStack, toInt(string(token)))
-			// 		1.2.3 A left parenthesis: push it onto the operator stack.
 		} else if token == '(' {
 			operatorStack = append(operatorStack, token)
-			// 		1.2.4 A right parenthesis:
 		} else if token == ')' {
-			// 		1 While the thing on top of the operator stack is not a left parenthesis,
+			// 	While the thing on top of the operator stack is not a left parenthesis
 			for operatorStack[len(operatorStack)-1] != '(' {
-				// 			1 Pop the operator from the operator stack.
 				operator := operatorStack[len(operatorStack)-1]
 				operatorStack = operatorStack[:len(operatorStack)-1]
-				// 			2 Pop the value stack twice, getting two operands.
+
 				operands := [2]int{valueStack[len(valueStack)-1], valueStack[len(valueStack)-2]}
 				valueStack = valueStack[:len(valueStack)-2]
-				// 			3 Apply the operator to the operands, in the correct order.
+
 				result := applyOp(operands, operator)
-				// 			4 Push the result onto the value stack.
 				valueStack = append(valueStack, result)
 			}
-			// 		2 Pop the left parenthesis from the operator stack, and discard it.
+			// discard left parenthesis from the operator stack
 			operatorStack = operatorStack[:len(operatorStack)-1]
-			// 		1.2.5 An operator (call it thisOp):
-		} else {
+		} else { //operator
 			thisOp := token
-			// 		1 While the operator stack is not empty, and the top thing on the
-			// 			operator stack has the same or greater precedence as thisOp,
 			for len(operatorStack) != 0 && precedence(operatorStack[len(operatorStack)-1]) >= precedence(thisOp) {
-				// 			1 Pop the operator from the operator stack.
 				operator := operatorStack[len(operatorStack)-1]
 				operatorStack = operatorStack[:len(operatorStack)-1]
-				// 			2 Pop the value stack twice, getting two operands.
+
 				operands := [2]int{valueStack[len(valueStack)-1], valueStack[len(valueStack)-2]}
 				valueStack = valueStack[:len(valueStack)-2]
-				// 			3 Apply the operator to the operands, in the correct order.
+
 				result := applyOp(operands, operator)
-				// 			4 Push the result onto the value stack.
 				valueStack = append(valueStack, result)
 			}
-			// 		2 Push thisOp onto the operator stack.
 			operatorStack = append(operatorStack, thisOp)
-
 		}
-
 	}
-	// 2. While the operator stack is not empty,
 	for len(operatorStack) != 0 {
-		// 	1 Pop the operator from the operator stack.
 		operator := operatorStack[len(operatorStack)-1]
 		operatorStack = operatorStack[:len(operatorStack)-1]
-		// 	2 Pop the value stack twice, getting two operands.
+
 		operands := [2]int{valueStack[len(valueStack)-1], valueStack[len(valueStack)-2]}
 		valueStack = valueStack[:len(valueStack)-2]
-		// 	3 Apply the operator to the operands, in the correct order.
+
 		result := applyOp(operands, operator)
-		// 	4 Push the result onto the value stack.
 		valueStack = append(valueStack, result)
 	}
-	// 3. At this point the operator stack should be empty, and the value
-	// 	stack should have only one value in it, which is the final result.
+	// The result is the only value left in the value stack
 	return valueStack[0]
 }
 
