@@ -62,6 +62,7 @@ func part2(inputPath string) int {
 	return chineseRemainderTheorem(remainders, divisors)
 }
 
+// https://brilliant.org/wiki/chinese-remainder-theorem/ and https://www.dave4math.com/mathematics/chinese-remainder-theorem/
 func chineseRemainderTheorem(remainders, divisors []int) int {
 	N := 1
 	for _, divisor := range divisors {
@@ -78,6 +79,7 @@ func chineseRemainderTheorem(remainders, divisors []int) int {
 	return solution % N
 }
 
+// https://www.geeksforgeeks.org/multiplicative-inverse-under-modulo-m/
 func modularInverse(a, m int) int {
 	if gcd(a, m) == 1 {
 		return power(a, m-2, m)
