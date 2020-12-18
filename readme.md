@@ -27,6 +27,7 @@ This year I am doing it in Go.
 | [15](https://adventofcode.com/2020/day/15) | Rambunctious Recitation | ⭐⭐    |
 | [16](https://adventofcode.com/2020/day/16) | Ticket Translation      | ⭐⭐    |
 | [17](https://adventofcode.com/2020/day/17) | Conway Cubes            | ⭐⭐    |
+| [18](https://adventofcode.com/2020/day/18) | Operation Order         | ⭐⭐    |
 
 ## Running the code
 
