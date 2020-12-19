@@ -13,17 +13,16 @@ func main() {
 	fmt.Println("--- Part One ---")
 	fmt.Println(part1(inputPath))
 
-	inputPath = "./day_19/input2.txt"
 	fmt.Println("--- Part Two ---")
-	fmt.Println(part2(inputPath))
+	// fmt.Println(part2(inputPath))
 }
 
 func part1(inputPath string) int {
 	rules, messages, maxLength := processInput(inputPath)
 
 	// TODO: hide rule memo from this part
-	ruleMemo := make(map[int][]string)
-	validMessages, ruleMemo := computeMessagesThatMatch(0, rules, ruleMemo, maxLength)
+	exprMemo := make(map[string][]string)
+	validMessages, exprMemo := computeMessagesThatMatch(rules[0], rules, exprMemo, maxLength)
 	count := 0
 	for _, message := range messages {
 		// if message in validMessages
@@ -38,30 +37,41 @@ func part1(inputPath string) int {
 }
 
 func part2(inputPath string) int {
-	rules, _, maxLength := processInput(inputPath)
+	rules, messages, maxLength := processInput(inputPath)
 	rules[8] = "42 | 42 8"
 	rules[11] = "42 31 | 42 11 31"
 
-	fmt.Println(maxLength)
+	exprMemo := make(map[string][]string)
+	validMessages, exprMemo := computeMessagesThatMatch(rules[0], rules, exprMemo, maxLength)
+	count := 0
+	for _, message := range messages {
+		// if message in validMessages
+		for _, validMessage := range validMessages {
+			if message == validMessage {
+				count++
+				break
+			}
+		}
+	}
 
-	return 0
+	return count
 }
 
-func computeMessagesThatMatch(ruleID int, rules map[int]string, ruleMemo map[int][]string, maxLength int) ([]string, map[int][]string) {
+func computeMessagesThatMatch(expression string, rules map[int]string, exprMemo map[string][]string, maxLength int) ([]string, map[string][]string) {
 	// if already computed
-	if _, ok := ruleMemo[ruleID]; ok {
-		return ruleMemo[ruleID], ruleMemo
+	if _, ok := exprMemo[expression]; ok {
+		return exprMemo[expression], exprMemo
 	}
 
 	// if rule is matching character return it
-	if strings.HasPrefix(rules[ruleID], `"`) {
+	if strings.HasPrefix(expression, `"`) {
 		// remove quotation marks
-		ruleMemo[ruleID] = []string{strings.ReplaceAll(rules[ruleID], `"`, ``)}
-		return ruleMemo[ruleID], ruleMemo
+		exprMemo[expression] = []string{strings.ReplaceAll(expression, `"`, ``)}
+		return exprMemo[expression], exprMemo
 	}
 
-	if strings.Contains(rules[ruleID], " | ") {
-		listsOfSubRulesStr := strings.Split(rules[ruleID], " | ")
+	if strings.Contains(expression, " | ") {
+		listsOfSubRulesStr := strings.Split(expression, " | ")
 		// each side of the |
 		var allMessages []string
 		for _, val := range listsOfSubRulesStr {
@@ -74,16 +84,16 @@ func computeMessagesThatMatch(ruleID int, rules map[int]string, ruleMemo map[int
 			var sideMessages []string
 			for _, ruleID := range sideRules {
 				var validMessages []string
-				validMessages, ruleMemo = computeMessagesThatMatch(ruleID, rules, ruleMemo, maxLength)
+				validMessages, exprMemo = computeMessagesThatMatch(rules[ruleID], rules, exprMemo, maxLength)
 				sideMessages = combineStringSlices(sideMessages, validMessages)
 			}
 
 			allMessages = append(allMessages, sideMessages...)
 		}
-		ruleMemo[ruleID] = allMessages
-		return ruleMemo[ruleID], ruleMemo
+		exprMemo[expression] = allMessages
+		return exprMemo[expression], exprMemo
 	}
-	sidesRulesStr := strings.Split(rules[ruleID], " ")
+	sidesRulesStr := strings.Split(expression, " ")
 	// convert all side rules
 	var sideRules []int
 	for _, val := range sidesRulesStr {
@@ -92,11 +102,11 @@ func computeMessagesThatMatch(ruleID int, rules map[int]string, ruleMemo map[int
 	var allMessages []string
 	for _, ruleID := range sideRules {
 		var validMessages []string
-		validMessages, ruleMemo = computeMessagesThatMatch(ruleID, rules, ruleMemo, maxLength)
+		validMessages, exprMemo = computeMessagesThatMatch(rules[ruleID], rules, exprMemo, maxLength)
 		allMessages = combineStringSlices(allMessages, validMessages)
 	}
-	ruleMemo[ruleID] = allMessages
-	return ruleMemo[ruleID], ruleMemo
+	exprMemo[expression] = allMessages
+	return exprMemo[expression], exprMemo
 }
 
 func combineStringSlices(slices ...[]string) (result []string) {
