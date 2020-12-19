@@ -42,19 +42,73 @@ func part2(inputPath string) int {
 	rules[11] = "42 31 | 42 11 31"
 
 	exprMemo := make(map[string][]string)
-	validMessages, exprMemo := computeMessagesThatMatch(rules[0], rules, exprMemo, maxLength)
+	validMessages42, exprMemo := computeMessagesThatMatch(rules[42], rules, exprMemo, maxLength)
+	validMessages31, exprMemo := computeMessagesThatMatch(rules[31], rules, exprMemo, maxLength)
+
 	count := 0
-	for _, message := range messages {
-		// if message in validMessages
-		for _, validMessage := range validMessages {
-			if message == validMessage {
-				count++
-				break
-			}
-		}
-	}
+	// for _, message := range messages {
+	// 	// if message in validMessages
+	// 	for _, validMessage := range validMessages {
+	// 		if message == validMessage {
+	// 			count++
+	// 			break
+	// 		}
+	// 	}
+	// }
 
 	return count
+}
+
+func computeMessagesThatMatch2(expression string, rules map[int]string, exprMemo map[string][]string, maxLength int) ([]string, map[string][]string) {
+	// if already computed
+	if _, ok := exprMemo[expression]; ok {
+		return exprMemo[expression], exprMemo
+	}
+
+	// if rule is matching character return it
+	if strings.HasPrefix(expression, `"`) {
+		// remove quotation marks
+		exprMemo[expression] = []string{strings.ReplaceAll(expression, `"`, ``)}
+		return exprMemo[expression], exprMemo
+	}
+
+	if strings.Contains(expression, " | ") {
+		listsOfSubRulesStr := strings.Split(expression, " | ")
+		// each side of the |
+		var allMessages []string
+		for _, val := range listsOfSubRulesStr {
+			sidesRulesStr := strings.Split(val, " ")
+			// convert all side rules
+			var sideRules []int
+			for _, val := range sidesRulesStr {
+				sideRules = append(sideRules, toInt(val))
+			}
+			var sideMessages []string
+			for _, ruleID := range sideRules {
+				var validMessages []string
+				validMessages, exprMemo = computeMessagesThatMatch2(rules[ruleID], rules, exprMemo, maxLength)
+				sideMessages = combineStringSlices(sideMessages, validMessages)
+			}
+
+			allMessages = append(allMessages, sideMessages...)
+		}
+		exprMemo[expression] = allMessages
+		return exprMemo[expression], exprMemo
+	}
+	sidesRulesStr := strings.Split(expression, " ")
+	// convert all side rules
+	var sideRules []int
+	for _, val := range sidesRulesStr {
+		sideRules = append(sideRules, toInt(val))
+	}
+	var allMessages []string
+	for _, ruleID := range sideRules {
+		var validMessages []string
+		validMessages, exprMemo = computeMessagesThatMatch2(rules[ruleID], rules, exprMemo, maxLength)
+		allMessages = combineStringSlices(allMessages, validMessages)
+	}
+	exprMemo[expression] = allMessages
+	return exprMemo[expression], exprMemo
 }
 
 func computeMessagesThatMatch(expression string, rules map[int]string, exprMemo map[string][]string, maxLength int) ([]string, map[string][]string) {
