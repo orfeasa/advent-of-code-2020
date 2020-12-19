@@ -19,21 +19,11 @@ func main() {
 }
 
 func part1(inputPath string) int {
-	input := strings.Split(readRaw(inputPath), "\n\n")
-
-	rulesRaw := strings.Split(input[0], "\n")
-	messages := strings.Split(input[1], "\n")
-
-	rules := make(map[int]string)
-	for _, rule := range rulesRaw {
-		rulesRe := regexp.MustCompile(`^(\d+): (.*)$`)
-		match := rulesRe.FindAllStringSubmatch(rule, -1)
-		rules[toInt(match[0][1])] = match[0][2]
-	}
+	rules, messages, maxLength := processInput(inputPath)
 
 	// TODO: hide rule memo from this part
 	ruleMemo := make(map[int][]string)
-	validMessages, ruleMemo := computeMessagesThatMatch(0, rules, ruleMemo)
+	validMessages, ruleMemo := computeMessagesThatMatch(0, rules, ruleMemo, maxLength)
 	count := 0
 	for _, message := range messages {
 		// if message in validMessages
@@ -48,11 +38,16 @@ func part1(inputPath string) int {
 }
 
 func part2(inputPath string) int {
+	rules, _, maxLength := processInput(inputPath)
+	rules[8] = "42 | 42 8"
+	rules[11] = "42 31 | 42 11 31"
+
+	fmt.Println(maxLength)
+
 	return 0
 }
 
-func computeMessagesThatMatch(ruleID int, rules map[int]string, ruleMemo map[int][]string) ([]string, map[int][]string) {
-
+func computeMessagesThatMatch(ruleID int, rules map[int]string, ruleMemo map[int][]string, maxLength int) ([]string, map[int][]string) {
 	// if already computed
 	if _, ok := ruleMemo[ruleID]; ok {
 		return ruleMemo[ruleID], ruleMemo
@@ -70,21 +65,24 @@ func computeMessagesThatMatch(ruleID int, rules map[int]string, ruleMemo map[int
 		// each side of the |
 		var allMessages []string
 		for _, val := range listsOfSubRulesStr {
-
 			sidesRulesStr := strings.Split(val, " ")
 			// convert all side rules
 			var sideRules []int
-			var sideMessages []string
 			for _, val := range sidesRulesStr {
 				sideRules = append(sideRules, toInt(val))
 			}
-			sideMessages, ruleMemo = computeMessagesThatMatchAll(sideRules, rules, ruleMemo)
+			var sideMessages []string
+			for _, ruleID := range sideRules {
+				var validMessages []string
+				validMessages, ruleMemo = computeMessagesThatMatch(ruleID, rules, ruleMemo, maxLength)
+				sideMessages = combineStringSlices(sideMessages, validMessages)
+			}
+
 			allMessages = append(allMessages, sideMessages...)
 		}
 		ruleMemo[ruleID] = allMessages
 		return ruleMemo[ruleID], ruleMemo
 	}
-
 	sidesRulesStr := strings.Split(rules[ruleID], " ")
 	// convert all side rules
 	var sideRules []int
@@ -92,19 +90,13 @@ func computeMessagesThatMatch(ruleID int, rules map[int]string, ruleMemo map[int
 		sideRules = append(sideRules, toInt(val))
 	}
 	var allMessages []string
-	allMessages, ruleMemo = computeMessagesThatMatchAll(sideRules, rules, ruleMemo)
+	for _, ruleID := range sideRules {
+		var validMessages []string
+		validMessages, ruleMemo = computeMessagesThatMatch(ruleID, rules, ruleMemo, maxLength)
+		allMessages = combineStringSlices(allMessages, validMessages)
+	}
 	ruleMemo[ruleID] = allMessages
 	return ruleMemo[ruleID], ruleMemo
-}
-
-func computeMessagesThatMatchAll(ruleIDs []int, rules map[int]string, ruleMemo map[int][]string) ([]string, map[int][]string) {
-	var prevMessages []string
-	for _, ruleID := range ruleIDs {
-		var validMessages []string
-		validMessages, ruleMemo = computeMessagesThatMatch(ruleID, rules, ruleMemo)
-		prevMessages = combineStringSlices(prevMessages, validMessages)
-	}
-	return prevMessages, ruleMemo
 }
 
 func combineStringSlices(slices ...[]string) (result []string) {
@@ -114,19 +106,36 @@ func combineStringSlices(slices ...[]string) (result []string) {
 		temp2 := append(temp, slices[2:]...)
 		return combineStringSlices(temp2...)
 	}
-
-	slice1 := slices[0]
-	slice2 := slices[1]
-
-	if len(slice1) == 0 {
-		return slice2
+	if len(slices[0]) == 0 {
+		return slices[1]
 	}
-	for _, val1 := range slice1 {
-		for _, val2 := range slice2 {
+	for _, val1 := range slices[0] {
+		for _, val2 := range slices[1] {
 			result = append(result, val1+val2)
 		}
 	}
 	return result
+}
+
+func processInput(inputPath string) (rules map[int]string, messages []string, maxLength int) {
+	input := strings.Split(readRaw(inputPath), "\n\n")
+	rulesRaw := strings.Split(input[0], "\n")
+	messages = strings.Split(input[1], "\n")
+
+	rules = make(map[int]string)
+	for _, rule := range rulesRaw {
+		rulesRe := regexp.MustCompile(`^(\d+): (.*)$`)
+		match := rulesRe.FindAllStringSubmatch(rule, -1)
+		rules[toInt(match[0][1])] = match[0][2]
+	}
+
+	maxLength = 0
+	for _, message := range messages {
+		if len(message) > maxLength {
+			maxLength = len(message)
+		}
+	}
+	return rules, messages, maxLength
 }
 
 func readRaw(filename string) string {
