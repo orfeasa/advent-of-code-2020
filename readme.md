@@ -48,6 +48,8 @@ Make sure you have given permission to execute (`chmod +x run_all.sh`).
 | [17](https://adventofcode.com/2020/day/17) | Conway Cubes            | ⭐⭐    |
 | [18](https://adventofcode.com/2020/day/18) | Operation Order         | ⭐⭐    |
 | [19](https://adventofcode.com/2020/day/19) | Monster Messages        | ⭐     |
+| [20](https://adventofcode.com/2020/day/20) | Jurassic Jigsaw         | ⭐     |
+
 
 ## Linting
 
