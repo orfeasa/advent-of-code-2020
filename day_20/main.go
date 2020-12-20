@@ -18,46 +18,27 @@ func main() {
 }
 
 func part1(inputPath string) int {
-	input := readRaw(inputPath)
-	tilesRaw := strings.Split(input, "\n\n")
-	var tiles []tile
-	for _, tileRaw := range tilesRaw {
-		tileRawSplit := strings.Split(tileRaw, "\n")
-		id := toInt(strings.TrimRight(strings.TrimLeft(tileRawSplit[0], "Tile "), ":\n"))
-		image := tileRawSplit[1:]
-		borderIDs := calculateBorderIDs(image)
-		newTile := tile{
-			id: id, image: image, borderIDs: borderIDs,
-		}
-		tiles = append(tiles, newTile)
-	}
-
-	// tileBorderIDs[123] = [a, b, c] means the border id 123 is present for tiles with IDs a, b c
-	tileBorderIDs := make(map[int][]int)
-	for _, tile := range tiles {
-		for _, borderID := range tile.borderIDs {
-			tileBorderIDs[borderID] = append(tileBorderIDs[borderID], tile.id)
-		}
-	}
-
-	// countTileOccurencesInBorder[123] = 2 means tile with id 123 is present in the border twice
-	countTileOccurencesInBorder := make(map[int]int)
-	for _, val := range tileBorderIDs {
-		if len(val)%2 == 1 {
-			countTileOccurencesInBorder[val[0]]++
-		}
-	}
-
+	_, cornerTilesIDs, _, _ := processInput(inputPath)
 	acc := 1
-	for k, v := range countTileOccurencesInBorder {
-		if v%2 == 0 {
-			acc *= k
-		}
+	for _, id := range cornerTilesIDs {
+		acc *= id
 	}
 	return acc
 }
 
 func part2(inputPath string) int {
+	// tiles, cornerTilesIDs, borderTileIDs, internalTileIDs := processInput(inputPath)
+
+	// elect the top-left corner
+	// corner tiles are the tiles that 2 of their border IDs exist in only 1 tile
+
+	// rotate and flip tile so that left and top tile are the corner ones
+
+	// find the tile that connects to the right of it
+	// this is the only one that has the right id, rotated and flipped to be in the correct way and the top to be the border one
+
+	// assembledImage := make([][]int)
+
 	return 0
 }
 
@@ -125,6 +106,48 @@ type tile struct {
 	id        int
 	image     []string
 	borderIDs []int
+}
+
+func processInput(inputPath string) (tiles []tile, cornerTilesIDs []int, borderTileIDs []int, internalTileIDs []int) {
+	input := readRaw(inputPath)
+	tilesRaw := strings.Split(input, "\n\n")
+	for _, tileRaw := range tilesRaw {
+		tileRawSplit := strings.Split(tileRaw, "\n")
+		id := toInt(strings.TrimRight(strings.TrimLeft(tileRawSplit[0], "Tile "), ":\n"))
+		image := tileRawSplit[1:]
+		borderIDs := calculateBorderIDs(image)
+		newTile := tile{
+			id: id, image: image, borderIDs: borderIDs,
+		}
+		tiles = append(tiles, newTile)
+	}
+
+	// tileBorderIDs[123] = [a, b, c] means the border id 123 is present for tiles with IDs a, b c
+	tileBorderIDs := make(map[int][]int)
+	for _, tile := range tiles {
+		for _, borderID := range tile.borderIDs {
+			tileBorderIDs[borderID] = append(tileBorderIDs[borderID], tile.id)
+		}
+	}
+
+	// countTileOccurencesInBorder[123] = 2 means tile with id 123 is present in the border twice
+	countTileOccurencesInBorder := make(map[int]int)
+	for _, tiles := range tileBorderIDs {
+		if len(tiles) == 1 {
+			countTileOccurencesInBorder[tiles[0]]++
+		}
+	}
+
+	for _, tile := range tiles {
+		if countTileOccurencesInBorder[tile.id] == 2 {
+			cornerTilesIDs = append(cornerTilesIDs, tile.id)
+		} else if countTileOccurencesInBorder[tile.id] == 1 {
+			borderTileIDs = append(borderTileIDs, tile.id)
+		} else {
+			internalTileIDs = append(internalTileIDs, tile.id)
+		}
+	}
+	return tiles, cornerTilesIDs, borderTileIDs, internalTileIDs
 }
 
 func readRaw(filename string) string {
