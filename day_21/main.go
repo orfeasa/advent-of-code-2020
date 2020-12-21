@@ -3,8 +3,8 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -19,9 +19,109 @@ func main() {
 }
 
 func part1(inputPath string) int {
+	ingredients, allergenToIngredientsCandidates := processInput(inputPath)
+
+	// ingredientToOccurrences["mxmxvkd"] = 3 means that ingredient mxmxvkd is present in 3 foods
+	ingredientToOccurrences := make(map[string]int)
+	for _, ingredientsOfFood := range ingredients {
+		for _, allergen := range ingredientsOfFood {
+			ingredientToOccurrences[allergen]++
+		}
+	}
+
+	for _, ingredients := range allergenToIngredientsCandidates {
+		for _, ingredient := range ingredients {
+			delete(ingredientToOccurrences, ingredient)
+		}
+	}
+
+	acc := 0
+	for _, v := range ingredientToOccurrences {
+		acc += v
+	}
+
+	return acc
+}
+
+func part2(inputPath string) string {
+	_, allergenToIngredientsCandidates := processInput(inputPath)
+
+	allergenToIngredient := make(map[string]string)
+
+	// until there are no allergens without an ingredient connection
+	for len(allergenToIngredientsCandidates) != 0 {
+		for allergen, ingredientCandidates := range allergenToIngredientsCandidates {
+			// if there's only one possibility for a rule to validate a field
+			if len(ingredientCandidates) == 1 {
+				allergenToIngredient[allergen] = ingredientCandidates[0]
+				allergenToIngredientsCandidates = removeKeyFromMap(allergenToIngredientsCandidates, ingredientCandidates[0])
+			}
+		}
+	}
+
+	fmt.Println(allergenToIngredient)
+
+	sortedAllergens := make([]string, 0, len(allergenToIngredient))
+	for allergen := range allergenToIngredient {
+		sortedAllergens = append(sortedAllergens, allergen)
+	}
+	sort.Strings(sortedAllergens)
+	fmt.Println(sortedAllergens)
+
+	sortedIngredientsByAllergen := make([]string, 0, len(allergenToIngredient))
+	for _, allergen := range sortedAllergens {
+		sortedIngredientsByAllergen = append(sortedIngredientsByAllergen, allergenToIngredient[allergen])
+	}
+
+	return strings.Join(sortedIngredientsByAllergen, ",")
+}
+
+func removeKeyFromMap(m map[string][]string, key string) map[string][]string {
+	// remove key from map values slice
+	for k, v := range m {
+		for _, i := range v {
+			if i == key {
+				m[k] = removeFromSlice(v, i)
+				break
+			}
+		}
+	}
+	// completely remove key if it's now empty
+	for k, v := range m {
+		if len(v) == 0 {
+			delete(m, k)
+		}
+	}
+	return m
+}
+
+// deletes the first occurrence of item in array, assuming order is not important
+func removeFromSlice(array []string, item string) []string {
+	for ind, val := range array {
+		if val == item {
+			array[ind] = array[len(array)-1]
+			return array[:len(array)-1]
+		}
+	}
+	return array
+}
+
+func intersect(array1 []string, array2 []string) (result []string) {
+	array1map := make(map[string]bool)
+	for _, val1 := range array1 {
+		array1map[val1] = true
+	}
+	for _, val2 := range array2 {
+		if _, ok := array1map[val2]; ok {
+			result = append(result, val2)
+		}
+	}
+	return result
+}
+
+func processInput(inputPath string) (ingredients [][]string, allergenToIngredientsCandidates map[string][]string) {
 	list := readStrings(inputPath)
 	var allergens [][]string
-	var ingredients [][]string
 	for _, line := range list {
 		listSplit := strings.Split(line, " (")
 		ingredientsOfFood := strings.Split(listSplit[0], " ")
@@ -34,25 +134,19 @@ func part1(inputPath string) int {
 	}
 
 	// create map for each allergen which ingredients it could be caused from
-	allergenToIngredients := make(map[string][]string)
+	allergenToIngredientsCandidates = make(map[string][]string)
 	for foodInd, allergensOfFood := range allergens {
 		for _, allergen := range allergensOfFood {
 			// if not already in the map
-			if val, ok := allergenToIngredients[allergen]; !ok {
-				allergenToIngredients[allergen] = ingredients[foodInd]
+			if _, ok := allergenToIngredientsCandidates[allergen]; !ok {
+				allergenToIngredientsCandidates[allergen] = ingredients[foodInd]
 			} else {
-				// remove ingredients that are not present in allergenToIngredients[allergen] and ingredients[foodInd]
-
+				// remove ingredients that are not present in allergenToIngredientsCandidates[allergen] and ingredients[foodInd]
+				allergenToIngredientsCandidates[allergen] = intersect(allergenToIngredientsCandidates[allergen], ingredients[foodInd])
 			}
-
 		}
 	}
-
-	return 0
-}
-
-func part2(inputPath string) int {
-	return 0
+	return ingredients, allergenToIngredientsCandidates
 }
 
 func readStrings(filename string) []string {
@@ -67,26 +161,6 @@ func readStrings(filename string) []string {
 		text = append(text, strings.TrimRight(scanner.Text(), "\n"))
 	}
 	return text
-}
-
-func readNumbers(filename string) []int {
-	file, err := os.Open(filename)
-	check(err)
-	defer file.Close()
-
-	Scanner := bufio.NewScanner(file)
-
-	var numbers []int
-	for Scanner.Scan() {
-		numbers = append(numbers, toInt(Scanner.Text()))
-	}
-	return numbers
-}
-
-func readRaw(filename string) string {
-	content, err := ioutil.ReadFile(filename)
-	check(err)
-	return strings.TrimRight(string(content), "\n")
 }
 
 func check(err error) {
