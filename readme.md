@@ -1,6 +1,5 @@
 # 🎄 Advent of Code 2020 🎄
 
-
 ![AoC2020 logo](https://raw.githubusercontent.com/orfeasa/advent-of-code-2020/main/header.png)
 
 ## Summary
@@ -11,11 +10,13 @@ This year I am doing it in Go.
 
 ## Running the code
 
-To run the code of a specific day, make sure you [have Go installed](https://golang.org/doc/install) and from within the repo directory run the following, replacing `XX` with the day number, `01` - `25`:
+To run the code of a specific day from the root directory run the following, replacing `XX` with the day number, `01` - `25`:
 
 ```sh
 go run day_XX/main.go
 ```
+
+Make sure you [have Go installed](https://golang.org/doc/install).
 
 To run the code of all days run the script:
 
@@ -47,9 +48,9 @@ Make sure you have given permission to execute (`chmod +x run_all.sh`).
 | [16](https://adventofcode.com/2020/day/16) | Ticket Translation      | ⭐⭐    |
 | [17](https://adventofcode.com/2020/day/17) | Conway Cubes            | ⭐⭐    |
 | [18](https://adventofcode.com/2020/day/18) | Operation Order         | ⭐⭐    |
-| [19](https://adventofcode.com/2020/day/19) | Monster Messages        | ⭐     |
+| [19](https://adventofcode.com/2020/day/19) | Monster Messages        | ⭐⭐    |
 | [20](https://adventofcode.com/2020/day/20) | Jurassic Jigsaw         | ⭐     |
-
+| [21](https://adventofcode.com/2020/day/21) | Allergen Assessment     |       |
 
 ## Linting
 

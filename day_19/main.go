@@ -14,7 +14,7 @@ func main() {
 	fmt.Println(part1(inputPath))
 
 	fmt.Println("--- Part Two ---")
-	// fmt.Println(part2(inputPath))
+	fmt.Println(part2(inputPath))
 }
 
 func part1(inputPath string) int {
@@ -38,77 +38,55 @@ func part1(inputPath string) int {
 
 func part2(inputPath string) int {
 	rules, messages, maxLength := processInput(inputPath)
-	rules[8] = "42 | 42 8"
-	rules[11] = "42 31 | 42 11 31"
-
+	rules[8] = "42 | 42 8"         // 42 | 42 42 | 42 42 42 | 42 42 42 42 |...
+	rules[11] = "42 31 | 42 11 31" // 42 31 | 42 42 31 31 | 42 42 42 31 31 31 | ...
+	// 0: 8 11 so 0 is at least one 42 followed by more 31s than 42s
 	exprMemo := make(map[string][]string)
-	validMessages42, exprMemo := computeMessagesThatMatch(rules[42], rules, exprMemo, maxLength)
-	validMessages31, exprMemo := computeMessagesThatMatch(rules[31], rules, exprMemo, maxLength)
+	var validMessages42, validMessages31 []string
+	validMessages42, exprMemo = computeMessagesThatMatch(rules[42], rules, exprMemo, maxLength)
+	validMessages31, exprMemo = computeMessagesThatMatch(rules[31], rules, exprMemo, maxLength)
 
+	// iterate over all messages
 	count := 0
-	// for _, message := range messages {
-	// 	// if message in validMessages
-	// 	for _, validMessage := range validMessages {
-	// 		if message == validMessage {
-	// 			count++
-	// 			break
-	// 		}
-	// 	}
-	// }
-
-	return count
-}
-
-func computeMessagesThatMatch2(expression string, rules map[int]string, exprMemo map[string][]string, maxLength int) ([]string, map[string][]string) {
-	// if already computed
-	if _, ok := exprMemo[expression]; ok {
-		return exprMemo[expression], exprMemo
-	}
-
-	// if rule is matching character return it
-	if strings.HasPrefix(expression, `"`) {
-		// remove quotation marks
-		exprMemo[expression] = []string{strings.ReplaceAll(expression, `"`, ``)}
-		return exprMemo[expression], exprMemo
-	}
-
-	if strings.Contains(expression, " | ") {
-		listsOfSubRulesStr := strings.Split(expression, " | ")
-		// each side of the |
-		var allMessages []string
-		for _, val := range listsOfSubRulesStr {
-			sidesRulesStr := strings.Split(val, " ")
-			// convert all side rules
-			var sideRules []int
-			for _, val := range sidesRulesStr {
-				sideRules = append(sideRules, toInt(val))
+	for _, message := range messages {
+		count42s := 0
+		count31s := 0
+		low := 0
+		// match as many 42s match
+		for {
+			foundMatch := false
+			for _, validMessage42 := range validMessages42 {
+				if strings.HasPrefix(message[low:], validMessage42) {
+					low += len(validMessage42)
+					foundMatch = true
+					count42s++
+					break
+				}
 			}
-			var sideMessages []string
-			for _, ruleID := range sideRules {
-				var validMessages []string
-				validMessages, exprMemo = computeMessagesThatMatch2(rules[ruleID], rules, exprMemo, maxLength)
-				sideMessages = combineStringSlices(sideMessages, validMessages)
+			if !foundMatch {
+				break
 			}
-
-			allMessages = append(allMessages, sideMessages...)
 		}
-		exprMemo[expression] = allMessages
-		return exprMemo[expression], exprMemo
+		// match as many 31s match
+		for {
+			foundMatch := false
+			for _, validMessage31 := range validMessages31 {
+				if strings.HasPrefix(message[low:], validMessage31) {
+					low += len(validMessage31)
+					foundMatch = true
+					count31s++
+					break
+				}
+			}
+			if !foundMatch {
+				break
+			}
+		}
+		if low == len(message) && count31s != 0 && count42s > count31s {
+			count++
+		}
 	}
-	sidesRulesStr := strings.Split(expression, " ")
-	// convert all side rules
-	var sideRules []int
-	for _, val := range sidesRulesStr {
-		sideRules = append(sideRules, toInt(val))
-	}
-	var allMessages []string
-	for _, ruleID := range sideRules {
-		var validMessages []string
-		validMessages, exprMemo = computeMessagesThatMatch2(rules[ruleID], rules, exprMemo, maxLength)
-		allMessages = combineStringSlices(allMessages, validMessages)
-	}
-	exprMemo[expression] = allMessages
-	return exprMemo[expression], exprMemo
+	return count
 }
 
 func computeMessagesThatMatch(expression string, rules map[int]string, exprMemo map[string][]string, maxLength int) ([]string, map[string][]string) {
