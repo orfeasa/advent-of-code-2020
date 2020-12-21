@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -39,15 +38,12 @@ func part1(inputPath string) int {
 	for _, v := range ingredientToOccurrences {
 		acc += v
 	}
-
 	return acc
 }
 
 func part2(inputPath string) string {
 	_, allergenToIngredientsCandidates := processInput(inputPath)
-
 	allergenToIngredient := make(map[string]string)
-
 	// until there are no allergens without an ingredient connection
 	for len(allergenToIngredientsCandidates) != 0 {
 		for allergen, ingredientCandidates := range allergenToIngredientsCandidates {
@@ -59,20 +55,16 @@ func part2(inputPath string) string {
 		}
 	}
 
-	fmt.Println(allergenToIngredient)
-
 	sortedAllergens := make([]string, 0, len(allergenToIngredient))
 	for allergen := range allergenToIngredient {
 		sortedAllergens = append(sortedAllergens, allergen)
 	}
 	sort.Strings(sortedAllergens)
-	fmt.Println(sortedAllergens)
 
 	sortedIngredientsByAllergen := make([]string, 0, len(allergenToIngredient))
 	for _, allergen := range sortedAllergens {
 		sortedIngredientsByAllergen = append(sortedIngredientsByAllergen, allergenToIngredient[allergen])
 	}
-
 	return strings.Join(sortedIngredientsByAllergen, ",")
 }
 
@@ -167,30 +159,4 @@ func check(err error) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func toInt(s string) int {
-	result, err := strconv.Atoi(s)
-	check(err)
-	return result
-}
-
-func max(numbers []int) int {
-	currMax := numbers[0]
-	for _, val := range numbers {
-		if val > currMax {
-			currMax = val
-		}
-	}
-	return currMax
-}
-
-func min(numbers []int) int {
-	currMin := numbers[0]
-	for _, val := range numbers {
-		if val < currMin {
-			currMin = val
-		}
-	}
-	return currMin
 }
