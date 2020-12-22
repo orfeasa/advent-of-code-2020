@@ -51,6 +51,7 @@ Make sure you have given permission to execute (`chmod +x run_all.sh`).
 | [19](https://adventofcode.com/2020/day/19) | Monster Messages        | ⭐⭐    |
 | [20](https://adventofcode.com/2020/day/20) | Jurassic Jigsaw         | ⭐     |
 | [21](https://adventofcode.com/2020/day/21) | Allergen Assessment     | ⭐⭐    |
+| [22](https://adventofcode.com/2020/day/22) | Crab Combat             | ⭐     |
 
 ## Linting
 
