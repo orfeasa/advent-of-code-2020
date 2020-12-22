@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"reflect"
 	"strconv"
 	"strings"
 )
+
+const decksize = 100
 
 func main() {
 	inputPath := "./day_22/input.txt"
@@ -37,18 +38,17 @@ func part2(inputPath string) int {
 	return acc
 }
 
-// 1 game consists of many rounds
-// a round can spark the creation of a sub-game
-
 func playRecursiveCombat(deck1, deck2 []int) (winningDeck []int, winner int) {
-	gameDecksHistory := make([][][]int, 0)
+	gameDeckHistorySet := make(map[[2][decksize]int]bool)
 	for len(deck1) != 0 && len(deck2) != 0 {
-		for _, item := range gameDecksHistory {
-			if reflect.DeepEqual(item, [][]int{deck1, deck2}) {
-				return deck1, 1
-			}
+		var deck1arr [decksize]int
+		copy(deck1arr[:], deck1)
+		var deck2arr [decksize]int
+		copy(deck2arr[:], deck2)
+		if _, ok := gameDeckHistorySet[[2][decksize]int{deck1arr, deck2arr}]; ok {
+			return deck1, 1
 		}
-		gameDecksHistory = append(gameDecksHistory, [][]int{deck1, deck2})
+		gameDeckHistorySet[[2][decksize]int{deck1arr, deck2arr}] = true
 
 		card1 := deck1[0]
 		deck1 = deck1[1:]
