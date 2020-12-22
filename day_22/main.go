@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -17,48 +18,101 @@ func main() {
 }
 
 func part1(inputPath string) int {
-	inputRaw := readRaw(inputPath)
-	playersRaw := strings.Split(inputRaw, "\n\n")
-
-	pl1deck := stringToIntSlice(strings.Split(playersRaw[0], "\n")[1:])
-	pl2deck := stringToIntSlice(strings.Split(playersRaw[1], "\n")[1:])
-
-	for len(pl1deck) != 0 && len(pl2deck) != 0 {
-		pl1card := pl1deck[0]
-		pl1deck = pl1deck[1:]
-		pl2card := pl2deck[0]
-		pl2deck = pl2deck[1:]
-
-		if pl1card > pl2card {
-			pl1deck = append(pl1deck, pl1card, pl2card)
-		} else {
-			pl2deck = append(pl2deck, pl2card, pl1card)
-		}
-	}
-	var winningDeck []int
-	if len(pl1deck) != 0 {
-		winningDeck = pl1deck
-	} else {
-		winningDeck = pl2deck
-	}
-
+	pl1deck, pl2deck := processInput(inputPath)
+	winningDeck := playCombat(pl1deck, pl2deck)
 	acc := 0
 	for ind, val := range winningDeck {
 		acc += (len(winningDeck) - ind) * val
 	}
-
 	return acc
 }
 
 func part2(inputPath string) int {
-	return 0
+	pl1deck, pl2deck := processInput(inputPath)
+	winningDeck, _ := playRecursiveCombat(pl1deck, pl2deck)
+	acc := 0
+	for ind, val := range winningDeck {
+		acc += (len(winningDeck) - ind) * val
+	}
+	return acc
 }
+
+// 1 game consists of many rounds
+// a round can spark the creation of a sub-game
+
+func playRecursiveCombat(deck1, deck2 []int) (winningDeck []int, winner int) {
+	gameDecksHistory := make([][][]int, 0)
+	for len(deck1) != 0 && len(deck2) != 0 {
+		for _, item := range gameDecksHistory {
+			if reflect.DeepEqual(item, [][]int{deck1, deck2}) {
+				return deck1, 1
+			}
+		}
+		gameDecksHistory = append(gameDecksHistory, [][]int{deck1, deck2})
+
+		card1 := deck1[0]
+		deck1 = deck1[1:]
+		card2 := deck2[0]
+		deck2 = deck2[1:]
+
+		if len(deck1) >= card1 && len(deck2) >= card2 {
+			// recursive combat round initiation
+			deck1copy := make([]int, card1)
+			deck2copy := make([]int, card2)
+			copy(deck1copy, deck1[:card1])
+			copy(deck2copy, deck2[:card2])
+			_, winner := playRecursiveCombat(deck1copy, deck2copy)
+			if winner == 1 {
+				deck1 = append(deck1, card1, card2)
+			} else {
+				deck2 = append(deck2, card2, card1)
+			}
+		} else {
+			if card1 > card2 {
+				deck1 = append(deck1, card1, card2)
+			} else {
+				deck2 = append(deck2, card2, card1)
+			}
+		}
+	}
+	if len(deck1) != 0 {
+		return deck1, 1
+	}
+	return deck2, 2
+}
+
+func playCombat(deck1, deck2 []int) (winner []int) {
+	for len(deck1) != 0 && len(deck2) != 0 {
+		card1 := deck1[0]
+		deck1 = deck1[1:]
+		card2 := deck2[0]
+		deck2 = deck2[1:]
+		if card1 > card2 {
+			deck1 = append(deck1, card1, card2)
+		} else {
+			deck2 = append(deck2, card2, card1)
+		}
+	}
+	if len(deck1) != 0 {
+		return deck1
+	}
+	return deck2
+}
+
 func stringToIntSlice(input []string) []int {
 	var output = make([]int, 0, len(input))
 	for _, val := range input {
 		output = append(output, toInt(val))
 	}
 	return output
+}
+
+func processInput(inputPath string) (deck1, deck2 []int) {
+	inputRaw := readRaw(inputPath)
+	playersRaw := strings.Split(inputRaw, "\n\n")
+	deck1 = stringToIntSlice(strings.Split(playersRaw[0], "\n")[1:])
+	deck2 = stringToIntSlice(strings.Split(playersRaw[1], "\n")[1:])
+	return deck1, deck2
 }
 
 func readRaw(filename string) string {
@@ -77,24 +131,4 @@ func toInt(s string) int {
 	result, err := strconv.Atoi(s)
 	check(err)
 	return result
-}
-
-func max(numbers []int) int {
-	currMax := numbers[0]
-	for _, val := range numbers {
-		if val > currMax {
-			currMax = val
-		}
-	}
-	return currMax
-}
-
-func min(numbers []int) int {
-	currMin := numbers[0]
-	for _, val := range numbers {
-		if val < currMin {
-			currMin = val
-		}
-	}
-	return currMin
 }
