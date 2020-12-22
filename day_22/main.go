@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const decksize = 100
+const decksize = 52
 
 func main() {
 	inputPath := "./day_22/input.txt"
@@ -41,6 +41,7 @@ func part2(inputPath string) int {
 func playRecursiveCombat(deck1, deck2 []int) (winningDeck []int, winner int) {
 	gameDeckHistorySet := make(map[[2][decksize]int]bool)
 	for len(deck1) != 0 && len(deck2) != 0 {
+		// infinite loop check
 		var deck1arr [decksize]int
 		copy(deck1arr[:], deck1)
 		var deck2arr [decksize]int
@@ -54,7 +55,6 @@ func playRecursiveCombat(deck1, deck2 []int) (winningDeck []int, winner int) {
 		deck1 = deck1[1:]
 		card2 := deck2[0]
 		deck2 = deck2[1:]
-
 		if len(deck1) >= card1 && len(deck2) >= card2 {
 			// recursive combat round initiation
 			deck1copy := make([]int, card1)
