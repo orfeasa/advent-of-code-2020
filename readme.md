@@ -53,6 +53,8 @@ Make sure you have given permission to execute (`chmod +x run_all.sh`).
 | [21](https://adventofcode.com/2020/day/21) | Allergen Assessment     | ⭐⭐    |
 | [22](https://adventofcode.com/2020/day/22) | Crab Combat             | ⭐⭐    |
 | [23](https://adventofcode.com/2020/day/23) | Crab Cups               |       |
+| [24](https://adventofcode.com/2020/day/24) | Lobby Layout            | ⭐     |
+| [25](https://adventofcode.com/2020/day/25) |                         |       |
 
 ## Linting
 
