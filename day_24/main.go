@@ -4,12 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
 func main() {
-	inputPath := "./day_24/test_input.txt"
+	inputPath := "./day_24/input.txt"
 	fmt.Println("--- Part One ---")
 	fmt.Println(part1(inputPath))
 
@@ -31,64 +30,83 @@ func part1(inputPath string) int {
 }
 
 func part2(inputPath string) int {
-	tilesToFlip := processInput(inputPath)
+	tilesToFlipArray := processInput(inputPath)
 	coordToBlackTile := make(map[[3]int]bool)
-	var tileQueue [][3]int
-	for _, tile := range tilesToFlip {
+	tilesToCheck := make(map[[3]int]bool)
+
+	// do initial flipping (tiles can be flipped twice)
+	for _, tile := range tilesToFlipArray {
 		if _, ok := coordToBlackTile[tile]; ok {
-			delete(coordToBlackTile, tile)
+			coordToBlackTile[tile] = !coordToBlackTile[tile]
 		} else {
 			coordToBlackTile[tile] = true
-			tileQueue = append(tileQueue, getNeighbors(tile)...)
+		}
+		tilesToCheck[tile] = true
+		neighbors := getNeighbors(tile)
+		for _, neighbor := range neighbors {
+			tilesToCheck[neighbor] = true
 		}
 	}
-	tilesToFlip = tileQueue
-	tileQueue = nil
 
-	newcoordToBlackTile := make(map[[3]int]bool)
-	for k, v := range coordToBlackTile {
-		newcoordToBlackTile[k] = v
-	}
-	for days := 0; days < 10; days++ {
-		for _, tile := range tilesToFlip {
+	// start daily flipping
+	tilesToCheckNext := make(map[[3]int]bool)
+	tilesToFlip := make(map[[3]int]bool)
+	for days := 0; days < 100; days++ {
+		// find tiles to flip
+		for tile := range tilesToCheck {
 			if shouldFlip(tile, coordToBlackTile) {
-				if _, ok := coordToBlackTile[tile]; ok {
-					delete(newcoordToBlackTile, tile)
-				} else {
-					newcoordToBlackTile[tile] = true
-					tileQueue = append(tileQueue, getNeighbors(tile)...)
+				tilesToFlip[tile] = true
+				tilesToCheckNext[tile] = true
+				neighbors := getNeighbors(tile)
+				for _, neighbor := range neighbors {
+					tilesToCheckNext[neighbor] = true
 				}
 			}
 		}
-		tilesToFlip = tileQueue
-		tileQueue = nil
-
-		coordToBlackTile := make(map[[3]int]bool)
-		for k, v := range newcoordToBlackTile {
-			coordToBlackTile[k] = v
+		// flip them
+		for tile := range tilesToFlip {
+			if _, ok := coordToBlackTile[tile]; ok {
+				coordToBlackTile[tile] = !coordToBlackTile[tile]
+			} else {
+				coordToBlackTile[tile] = true
+			}
 		}
-
-		fmt.Println("Day", days+1, ":", len(coordToBlackTile))
+		// prepare for the next round
+		tilesToFlip = make(map[[3]int]bool)
+		tilesToCheck = tilesToCheckNext
+		tilesToCheckNext = make(map[[3]int]bool)
 	}
+	return countBlackTiles(coordToBlackTile)
+}
 
-	return len(coordToBlackTile)
+func countBlackTiles(coordToBlackTile map[[3]int]bool) (count int) {
+	for _, v := range coordToBlackTile {
+		if v {
+			count++
+		}
+	}
+	return count
 }
 
 func shouldFlip(tile [3]int, coordToBlackTile map[[3]int]bool) bool {
 	neighbors := getNeighbors(tile)
 	countBlackNeighbors := 0
-	for _, neighbor := range neighbors {
-		if coordToBlackTile[neighbor] {
+	for _, neighbour := range neighbors {
+		if coordToBlackTile[neighbour] {
 			countBlackNeighbors++
 		}
 	}
+	isBlack := false
+	if _, ok := coordToBlackTile[tile]; ok {
+		isBlack = coordToBlackTile[tile]
+	}
 
 	// Any black tile with zero or more than 2 black tiles immediately adjacent to it
-	if coordToBlackTile[tile] && (countBlackNeighbors == 0 || countBlackNeighbors > 2) {
+	if isBlack && (countBlackNeighbors == 0 || countBlackNeighbors > 2) {
 		return true
 	}
 	// Any white tile with exactly 2 black tiles immediately adjacent to it
-	if !coordToBlackTile[tile] && countBlackNeighbors == 2 {
+	if !isBlack && countBlackNeighbors == 2 {
 		return true
 	}
 	return false
@@ -97,9 +115,11 @@ func shouldFlip(tile [3]int, coordToBlackTile map[[3]int]bool) bool {
 func getNeighbors(tile [3]int) (neighbors [][3]int) {
 	for dx := -1; dx <= 1; dx++ {
 		for dy := -1; dy <= 1; dy++ {
-			// x + y + z = 0 always
-			neighbor := [3]int{tile[0] + dx, tile[1] + dy, tile[2] - dx - dy}
-			neighbors = append(neighbors, neighbor)
+			if dx != dy {
+				// x + y + z = 0 always
+				neighbor := [3]int{tile[0] + dx, tile[1] + dy, tile[2] - dx - dy}
+				neighbors = append(neighbors, neighbor)
+			}
 		}
 	}
 	return neighbors
@@ -166,10 +186,4 @@ func check(err error) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func toInt(s string) int {
-	result, err := strconv.Atoi(s)
-	check(err)
-	return result
 }
