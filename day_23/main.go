@@ -1,23 +1,19 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"sort"
 	"strconv"
 )
 
 func main() {
-	// input := "487912365"
-	testInput := "389125467"
+	input := "487912365"
 	fmt.Println("--- Part One ---")
-	fmt.Println(part1(testInput))
-
+	fmt.Println(part1(input))
 	fmt.Println("--- Part Two ---")
-	fmt.Println(part2(testInput))
+	fmt.Println(part2(input))
 }
 
-// TODO: check https://golang.org/pkg/container/ring/ and https://github.com/atedja/gring/blob/master/ring.go
 func part1(input string) int {
 	// parse input
 	labels := make([]int, 0, len(input))
@@ -28,7 +24,6 @@ func part1(input string) int {
 	var labelsSorted = make([]int, len(input))
 	copy(labelsSorted[:], labels[:])
 	sort.Sort(sort.Reverse(sort.IntSlice(labelsSorted[:])))
-	fmt.Println(labelsSorted)
 
 	// store labels in linked list
 	ll := CircularLinkedList{len: 0}
@@ -38,31 +33,23 @@ func part1(input string) int {
 
 	// simulate 100 moves
 	currentCup := ll.head
-	for i := 0; i < 10; i++ {
-		currentCupInd := ll.Search(currentCup.value)
-		fmt.Println("-- move", i+1, "--")
-		fmt.Println("cups:", ll.ListToArray(), ", current cup index:", currentCupInd)
+	for i := 0; i < 100; i++ {
 		// remove and keep value and order of 3 values next to current cup
 		var removed []int
 		for j := 0; j < 3; j++ {
-			val := ll.GetAt(currentCupInd + 1).value
+			val := ll.GetAt(ll.Search(currentCup.value) + 1).value
 			removed = append(removed, val)
-			ll.DeleteAt(currentCupInd + 1)
+			ll.DeleteAt(ll.Search(currentCup.value) + 1)
 		}
-		fmt.Println("pick up:", removed)
-
 		// select destination cup
 		destinationVal := getNext(currentCup.value, labelsSorted)
-		destinationPos := ll.Search(destinationVal)
-		for destinationPos == -1 {
+		for ll.Search(destinationVal) == -1 {
 			destinationVal = getNext(destinationVal, labelsSorted)
-			destinationPos = ll.Search(destinationVal)
 		}
-		fmt.Println("destination:", destinationVal, "\n")
 
 		// place cups next to destination
 		for ind, val := range removed {
-			ll.InsertAt(destinationPos+ind+1, val)
+			ll.InsertAt(ll.Search(destinationVal)+ind+1, val)
 		}
 		currentCup = currentCup.next
 	}
@@ -140,34 +127,22 @@ func (l *CircularLinkedList) Insert(val int) {
 
 // InsertAt inserts new node at given position
 func (l *CircularLinkedList) InsertAt(pos int, value int) {
-	// create a new node
-	newNode := Node{}
-	newNode.value = value
-	// validate the position
-	if pos < 0 {
-		return
-	}
-	if pos == 0 {
-		l.head = &newNode
-		l.len++
-		return
-	}
-	if pos > l.len {
-		return
-	}
-	n := l.GetAt(pos)
-	newNode.next = n
+	newNode := Node{value: value, next: l.GetAt(pos)}
 	prevNode := l.GetAt(pos - 1)
 	prevNode.next = &newNode
+	if pos%l.len == 0 {
+		l.head = prevNode.next
+	}
 	l.len++
 }
 
 // GetAt returns node at given position from linked list
 func (l *CircularLinkedList) GetAt(pos int) *Node {
-	ptr := l.head
-	if pos < 0 || pos > (l.len-1) {
-		pos = pos % l.len
+	pos %= l.len
+	if pos < 0 {
+		pos += l.len
 	}
+	ptr := l.head
 	for i := 0; i < pos; i++ {
 		ptr = ptr.next
 	}
@@ -188,48 +163,39 @@ func (l *CircularLinkedList) Search(val int) int {
 
 // DeleteAt deletes node at given position from linked list
 func (l *CircularLinkedList) DeleteAt(pos int) error {
-	// validate the position
-	if pos < 0 {
-		fmt.Println("position can not be negative")
-		return errors.New("position can not be negative")
-	}
-	if l.len == 0 {
-		fmt.Println("No nodes in list")
-		return errors.New("No nodes in list")
-	}
+	// pos %= l.len
 	prevNode := l.GetAt(pos - 1)
-	if prevNode == nil {
-		fmt.Println("Node not found")
-		return errors.New("Node not found")
-	}
 	prevNode.next = l.GetAt(pos).next
+	if pos%l.len == 0 {
+		l.head = prevNode.next
+	}
 	l.len--
 	return nil
 }
 
 // DeleteVal deletes node having given value from linked list
-func (l *CircularLinkedList) DeleteVal(val int) error {
-	ptr := l.head
-	if l.len == 0 {
-		fmt.Println("List is empty")
-		return errors.New("List is empty")
-	}
-	for i := 0; i < l.len; i++ {
-		if ptr.value == val {
-			if i > 0 {
-				prevNode := l.GetAt(i - 1)
-				prevNode.next = l.GetAt(i).next
-			} else {
-				l.head = ptr.next
-			}
-			l.len--
-			return nil
-		}
-		ptr = ptr.next
-	}
-	fmt.Println("Node not found")
-	return errors.New("Node not found")
-}
+// func (l *CircularLinkedList) DeleteVal(val int) error {
+// 	ptr := l.head
+// 	if l.len == 0 {
+// 		fmt.Println("List is empty")
+// 		return errors.New("List is empty")
+// 	}
+// 	for i := 0; i < l.len; i++ {
+// 		if ptr.value == val {
+// 			if i > 0 {
+// 				prevNode := l.GetAt(i - 1)
+// 				prevNode.next = l.GetAt(i).next
+// 			} else {
+// 				l.head = ptr.next
+// 			}
+// 			l.len--
+// 			return nil
+// 		}
+// 		ptr = ptr.next
+// 	}
+// 	fmt.Println("Node not found")
+// 	return errors.New("Node not found")
+// }
 
 func check(err error) {
 	if err != nil {
