@@ -28,27 +28,7 @@ func part1(input string) int {
 
 	currentCup := l.head
 	for i := 0; i < 100; i++ {
-		// remove and keep value and order of 3 values next to current cup
-		var removed []int
-		for j := 0; j < 3; j++ {
-			val := l.GetAt(l.Search(currentCup.value) + 1).value
-			removed = append(removed, val)
-			l.DeleteAt(l.Search(currentCup.value) + 1)
-		}
-		// select destination cup
-		destinationVal := currentCup.value - 1
-		for destinationVal <= 0 || intInSlice(removed, destinationVal) {
-			destinationVal--
-			if destinationVal <= 0 {
-				// assign to max value
-				destinationVal = l.len + len(removed)
-			}
-		}
-		// place cups next to destination
-		for ind, val := range removed {
-			l.InsertAt(l.Search(destinationVal)+ind+1, val)
-		}
-		currentCup = currentCup.next
+		currentCup = l.runCrabMove(currentCup)
 	}
 
 	node := l.GetAt(l.Search(1)).next
@@ -61,7 +41,59 @@ func part1(input string) int {
 }
 
 func part2(input string) int {
+
+	// circle has 1 mil total cups
+	// after 10 mil moves, find the 2 cups next to number 1
+	// parse input
+	labels := make([]int, 0, len(input))
+	for _, val := range input {
+		labels = append(labels, toInt(string(val)))
+	}
+
+	// store labels in linked list
+	l := CircularLinkedList{len: 0}
+	for _, val := range labels {
+		l.Insert(val)
+	}
+
+	for i := l.len + 1; i < 1e6; i++ {
+		l.Insert(i)
+	}
+
+	currentCup := l.head
+	for i := 0; i < 1e4; i++ {
+		currentCup = l.runCrabMove(currentCup)
+	}
+
+	node := l.GetAt(l.Search(1)).next
+	fmt.Println(node.value, node.next.value)
 	return 0
+}
+
+// TODO: always change current cup to head
+func (l *CircularLinkedList) runCrabMove(currentCup *Node) *Node {
+	// remove and keep value and order of 3 values next to current cup
+	var removed []int
+	for j := 0; j < 3; j++ {
+		val := l.GetAt(l.Search(currentCup.value) + 1).value
+		removed = append(removed, val)
+		l.DeleteAt(l.Search(currentCup.value) + 1)
+	}
+	// select destination cup
+	destinationVal := currentCup.value - 1
+	for destinationVal <= 0 || intInSlice(removed, destinationVal) {
+		destinationVal--
+		if destinationVal <= 0 {
+			// assign to max value
+			destinationVal = l.len + len(removed)
+		}
+	}
+	// place cups next to destination
+	for ind, val := range removed {
+		l.InsertAt(l.Search(destinationVal)+ind+1, val)
+	}
+	// l.head = currentCup.next
+	return currentCup.next
 }
 
 func intInSlice(slice []int, target int) bool {
