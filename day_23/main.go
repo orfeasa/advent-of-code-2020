@@ -87,17 +87,6 @@ type CircularLinkedList struct {
 	len  int
 }
 
-// ListToArray prints the circular list without repetition
-func (l *CircularLinkedList) ListToArray() []int {
-	array := make([]int, 0, l.len)
-	current := l.head
-	for i := 0; i < l.len; i++ {
-		array = append(array, current.value)
-		current = current.next
-	}
-	return array
-}
-
 // Insert inserts new node at the end of linked list
 func (l *CircularLinkedList) Insert(val int) {
 	n := Node{value: val, next: l.head}
