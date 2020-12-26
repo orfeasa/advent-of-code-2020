@@ -26,35 +26,40 @@ func part1(input string) int {
 	sort.Sort(sort.Reverse(sort.IntSlice(labelsSorted[:])))
 
 	// store labels in linked list
-	ll := CircularLinkedList{len: 0}
+	l := CircularLinkedList{len: 0}
 	for _, val := range labels {
-		ll.Insert(val)
+		l.Insert(val)
 	}
 
-	// simulate 100 moves
-	currentCup := ll.head
+	currentCup := l.head
 	for i := 0; i < 100; i++ {
 		// remove and keep value and order of 3 values next to current cup
 		var removed []int
 		for j := 0; j < 3; j++ {
-			val := ll.GetAt(ll.Search(currentCup.value) + 1).value
+			val := l.GetAt(l.Search(currentCup.value) + 1).value
 			removed = append(removed, val)
-			ll.DeleteAt(ll.Search(currentCup.value) + 1)
+			l.DeleteAt(l.Search(currentCup.value) + 1)
 		}
 		// select destination cup
 		destinationVal := getNext(currentCup.value, labelsSorted)
-		for ll.Search(destinationVal) == -1 {
+		for l.Search(destinationVal) == -1 {
 			destinationVal = getNext(destinationVal, labelsSorted)
 		}
-
 		// place cups next to destination
 		for ind, val := range removed {
-			ll.InsertAt(ll.Search(destinationVal)+ind+1, val)
+			l.InsertAt(l.Search(destinationVal)+ind+1, val)
 		}
 		currentCup = currentCup.next
 	}
 
-	return ll.GenerateIntReprStartingWithVal(1)
+	node := l.GetAt(l.Search(1))
+	node = node.next
+	repr := 0
+	for node.value != 1 {
+		repr = 10*repr + node.value
+		node = node.next
+	}
+	return repr
 }
 
 func part2(input string) int {
@@ -80,17 +85,6 @@ type Node struct {
 type CircularLinkedList struct {
 	head *Node
 	len  int
-}
-
-// GenerateIntReprStartingWithVal generates an int representation of the list that starts after val and goes through the entire list (except for val)
-func (l *CircularLinkedList) GenerateIntReprStartingWithVal(val int) (repr int) {
-	node := l.GetAt(l.Search(val))
-	node = node.next
-	for node.value != val {
-		repr = 10*repr + node.value
-		node = node.next
-	}
-	return repr
 }
 
 // ListToArray prints the circular list without repetition
@@ -163,7 +157,6 @@ func (l *CircularLinkedList) Search(val int) int {
 
 // DeleteAt deletes node at given position from linked list
 func (l *CircularLinkedList) DeleteAt(pos int) error {
-	// pos %= l.len
 	prevNode := l.GetAt(pos - 1)
 	prevNode.next = l.GetAt(pos).next
 	if pos%l.len == 0 {
@@ -172,30 +165,6 @@ func (l *CircularLinkedList) DeleteAt(pos int) error {
 	l.len--
 	return nil
 }
-
-// DeleteVal deletes node having given value from linked list
-// func (l *CircularLinkedList) DeleteVal(val int) error {
-// 	ptr := l.head
-// 	if l.len == 0 {
-// 		fmt.Println("List is empty")
-// 		return errors.New("List is empty")
-// 	}
-// 	for i := 0; i < l.len; i++ {
-// 		if ptr.value == val {
-// 			if i > 0 {
-// 				prevNode := l.GetAt(i - 1)
-// 				prevNode.next = l.GetAt(i).next
-// 			} else {
-// 				l.head = ptr.next
-// 			}
-// 			l.len--
-// 			return nil
-// 		}
-// 		ptr = ptr.next
-// 	}
-// 	fmt.Println("Node not found")
-// 	return errors.New("Node not found")
-// }
 
 func check(err error) {
 	if err != nil {
