@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -27,9 +28,19 @@ func part1(inputPath string) int {
 }
 
 func part2(inputPath string) int {
-	// tiles, cornerTilesIDs, borderTileIDs, internalTileIDs := processInput(inputPath)
+	tiles, cornerTilesIDs, borderTileIDs, internalTileIDs := processInput(inputPath)
 
 	// elect the top-left corner
+	gridSize := int(math.Sqrt(float64(len(tiles))))
+	grid := make([][]int, gridSize)
+	for ind := range grid {
+		grid[ind] = make([]int, gridSize)
+	}
+	grid[0][0] = cornerTilesIDs[0]
+
+	fmt.Println(len(borderTileIDs))
+	fmt.Println(len(internalTileIDs))
+
 	// corner tiles are the tiles that 2 of their border IDs exist in only 1 tile
 
 	// rotate and flip tile so that left and top tile are the corner ones
@@ -42,25 +53,32 @@ func part2(inputPath string) int {
 	return 0
 }
 
+type tile struct {
+	id        int
+	image     []string
+	borderIDs []int
+}
+
 // IDs are calculated by converting # to 1 and . to 0, and taking the resulting number or its reverse, whichever is smaller
-func calculateBorderIDs(image []string) (IDs []int) {
+func (t *tile) calculateBorderIDs() {
+	t.borderIDs = make([]int, 0, 4)
 	for i := 0; i < 4; i++ {
-		lineID := strings.ReplaceAll(image[0], "#", "1")
+		lineID := strings.ReplaceAll(t.image[0], "#", "1")
 		lineID = strings.ReplaceAll(lineID, ".", "0")
 		i, _ := strconv.ParseInt(lineID, 2, 32)
 		ID1 := int(i)
 		i, _ = strconv.ParseInt(reverse(lineID), 2, 32)
 		ID2 := int(i)
 		if ID1 < ID2 {
-			IDs = append(IDs, ID1)
+			t.borderIDs = append(t.borderIDs, ID1)
 		} else {
-			IDs = append(IDs, ID2)
+			t.borderIDs = append(t.borderIDs, ID2)
 		}
-		image = rotateImage(image)
+		t.rotateImage()
 	}
-	return IDs
 }
 
+// reverses a string
 func reverse(s string) (result string) {
 	for _, v := range s {
 		result = string(v) + result
@@ -68,44 +86,39 @@ func reverse(s string) (result string) {
 	return result
 }
 
-func flipImage(image []string) []string {
-	n := len(image)
+func (t *tile) flipImage() {
+	n := len(t.image)
 	flipped := make([][]rune, n)
-	for ind, line := range image {
+	// flip
+	for ind, line := range t.image {
 		flipped[ind] = make([]rune, n)
 		for i, j := 0, len(line)-1; i < j; i, j = i+1, j-1 {
 			flipped[ind][i], flipped[ind][j] = rune(line[j]), rune(line[i])
 		}
 	}
+	// convert to string slice
 	var newImage []string
 	for _, line := range flipped {
 		newImage = append(newImage, string(line))
 	}
-	return newImage
+	t.image = newImage
 }
 
-func rotateImage(image []string) []string {
-	n := len(image)
+func (t *tile) rotateImage() {
+	n := len(t.image)
 	rotated := make([][]rune, n)
 	for i := range rotated {
 		rotated[i] = make([]rune, n)
 	}
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
-			rotated[i][j] = rune(image[n-j-1][i])
+			rotated[i][j] = rune(t.image[n-j-1][i])
 		}
 	}
-	var newImage []string
+	t.image = nil
 	for _, line := range rotated {
-		newImage = append(newImage, string(line))
+		t.image = append(t.image, string(line))
 	}
-	return newImage
-}
-
-type tile struct {
-	id        int
-	image     []string
-	borderIDs []int
 }
 
 func processInput(inputPath string) (tiles []tile, cornerTilesIDs []int, borderTileIDs []int, internalTileIDs []int) {
@@ -115,10 +128,8 @@ func processInput(inputPath string) (tiles []tile, cornerTilesIDs []int, borderT
 		tileRawSplit := strings.Split(tileRaw, "\n")
 		id := toInt(strings.TrimRight(strings.TrimLeft(tileRawSplit[0], "Tile "), ":\n"))
 		image := tileRawSplit[1:]
-		borderIDs := calculateBorderIDs(image)
-		newTile := tile{
-			id: id, image: image, borderIDs: borderIDs,
-		}
+		newTile := tile{id: id, image: image}
+		newTile.calculateBorderIDs()
 		tiles = append(tiles, newTile)
 	}
 
@@ -130,18 +141,18 @@ func processInput(inputPath string) (tiles []tile, cornerTilesIDs []int, borderT
 		}
 	}
 
-	// countTileOccurencesInBorder[123] = 2 means tile with id 123 is present in the border twice
-	countTileOccurencesInBorder := make(map[int]int)
+	// countTileOccurrencesInBorder[123] = 2 means tile with id 123 is present in the border twice
+	countTileOccurrencesInBorder := make(map[int]int)
 	for _, tiles := range tileBorderIDs {
 		if len(tiles) == 1 {
-			countTileOccurencesInBorder[tiles[0]]++
+			countTileOccurrencesInBorder[tiles[0]]++
 		}
 	}
 
 	for _, tile := range tiles {
-		if countTileOccurencesInBorder[tile.id] == 2 {
+		if countTileOccurrencesInBorder[tile.id] == 2 {
 			cornerTilesIDs = append(cornerTilesIDs, tile.id)
-		} else if countTileOccurencesInBorder[tile.id] == 1 {
+		} else if countTileOccurrencesInBorder[tile.id] == 1 {
 			borderTileIDs = append(borderTileIDs, tile.id)
 		} else {
 			internalTileIDs = append(internalTileIDs, tile.id)
