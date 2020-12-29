@@ -11,9 +11,6 @@ func main() {
 	inputPath := "./day_25/input.txt"
 	fmt.Println("--- Part One ---")
 	fmt.Println(part1(inputPath))
-
-	fmt.Println("--- Part Two ---")
-	fmt.Println(part2(inputPath))
 }
 
 func part1(inputPath string) int {
@@ -24,10 +21,6 @@ func part1(inputPath string) int {
 	}
 	encryptionKey := transformSubjectNumber(publicKeys[0], loopSizes[1])
 	return encryptionKey
-}
-
-func part2(inputPath string) int {
-	return 0
 }
 
 func calculateLoopSize(subjectNumber, publicKey int) (loopSize int) {
