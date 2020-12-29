@@ -96,7 +96,7 @@ func part2(inputPath string) int {
 	seaMonster[2] = " #  #  #  #  #  #   "
 
 	seaMonsterCount := 0
-
+flipRotateLoop:
 	for fl := 0; fl < 2; fl++ {
 		for rot := 0; rot < 4; rot++ {
 			for imgy := 0; imgy < imageSize-len(seaMonster); imgy++ {
@@ -117,12 +117,9 @@ func part2(inputPath string) int {
 				}
 			}
 			if seaMonsterCount > 0 {
-				break
+				break flipRotateLoop
 			}
 			img.rotateImage()
-		}
-		if seaMonsterCount > 0 {
-			break
 		}
 		img.flipImage()
 	}
