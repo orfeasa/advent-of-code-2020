@@ -44,7 +44,7 @@ func part2(inputPath string) int {
 		}
 	}
 
-	// elect the top-left corner
+	// create tile grid
 	gridSize := int(math.Sqrt(float64(len(tileIDToTile))))
 	grid := make([][]int, gridSize)
 	for ind := range grid {
@@ -73,29 +73,81 @@ func part2(inputPath string) int {
 			delete(tilesLeft, grid[y][x])
 		}
 	}
-	fmt.Println(grid)
 
 	// create final image
 	tileSize := len(tileIDToTile[grid[0][0]].image) - 2 // without borders
 	imageSize := gridSize * tileSize
-	finalImage := make([]string, 0, imageSize)
+	finalImage := make([]string, imageSize)
+
+	for y := 0; y < imageSize; y++ {
+		finalImage[y] = ""
+		for x := 0; x < gridSize; x++ {
+			id := grid[y/tileSize][x]
+			imageLine := y%tileSize + 1
+			finalImage[y] += tileIDToTile[id].image[imageLine][1 : tileSize+1]
+		}
+	}
+	img := tile{image: finalImage}
 
 	// look for sea monsters
-	for y := 0; y < imageSize; y++ {
-		for _, id := range grid[y/tileSize] {
-			finalImage[y] += tileIDToTile[id].image[y/tileSize][1 : tileSize+1]
+	seaMonster := make([]string, 3)
+	seaMonster[0] = "                  # "
+	seaMonster[1] = "#    ##    ##    ###"
+	seaMonster[2] = " #  #  #  #  #  #   "
+
+	seaMonsterCount := 0
+
+	for fl := 0; fl < 2; fl++ {
+		for rot := 0; rot < 4; rot++ {
+			for imgy := 0; imgy < imageSize-len(seaMonster); imgy++ {
+				for imgx := 0; imgx < imageSize-len(seaMonster[0]); imgx++ {
+					seaMonsterFound := true
+				seaMonsterSearchLoop:
+					for indy, line := range seaMonster {
+						for indx, ch := range line {
+							if ch == '#' && img.image[imgy+indy][imgx+indx] != '#' {
+								seaMonsterFound = false
+								break seaMonsterSearchLoop
+							}
+						}
+					}
+					if seaMonsterFound {
+						seaMonsterCount++
+					}
+				}
+			}
+			if seaMonsterCount > 0 {
+				break
+			}
+			img.rotateImage()
+		}
+		if seaMonsterCount > 0 {
+			break
+		}
+		img.flipImage()
+	}
+
+	// count number of # in whole image
+	countAllHash := 0
+	for _, line := range finalImage {
+		for _, ch := range line {
+			if ch == '#' {
+				countAllHash++
+			}
 		}
 	}
 
-	for _, line := range finalImage {
-		fmt.Println(line)
+	// count number of # per sea monster
+	countSeaMonsterHash := 0
+	for _, line := range seaMonster {
+		for _, ch := range line {
+			if ch == '#' {
+				countSeaMonsterHash++
+			}
+		}
 	}
 
-	// seaMonster := "                  #"
-	// +"#    ##    ##    ###"
-	// +"#  #  #  #  #  #   "
-
-	return 0
+	return countAllHash - countSeaMonsterHash*seaMonsterCount
 }
 
 // reverse returns the reverse of a string
@@ -105,6 +157,7 @@ func reverse(s string) string {
 		rns[i], rns[j] = rns[j], rns[i]
 	}
 	return string(rns)
+
 }
 
 func findTileThatFits(top, left string, tiles map[int]*tile, borderIDtoTiles map[int][]int) (id int) {
