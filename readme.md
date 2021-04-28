@@ -1,3 +1,4 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/orfeasa/advent-of-code-2020)](https://goreportcard.com/report/github.com/orfeasa/advent-of-code-2020)
 # 🎄 Advent of Code 2020 🎄
 
 ![AoC2020 logo](https://raw.githubusercontent.com/orfeasa/advent-of-code-2020/main/header.png)
